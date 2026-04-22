@@ -1,0 +1,3149 @@
+/* ── SHELL ───────────────────────────────────────────── */
+.oav-shell {
+  width: min(calc(100% - 3rem), var(--oav-shell));
+  margin-inline: auto;
+}
+
+@media (width >760px) {
+  html,
+  body {
+    scrollbar-color: #1a7fd4 #ffffff;
+    scrollbar-width: auto;
+  }
+
+  html::-webkit-scrollbar,
+  body::-webkit-scrollbar {
+    width: 14px;
+    background: #ffffff;
+  }
+
+  html::-webkit-scrollbar-track,
+  body::-webkit-scrollbar-track {
+    background: #ffffff;
+  }
+
+  html::-webkit-scrollbar-thumb,
+  body::-webkit-scrollbar-thumb {
+    background: #1a7fd4;
+    border: 3px solid #ffffff;
+    border-radius: 999px;
+  }
+
+  html::-webkit-scrollbar-button,
+  body::-webkit-scrollbar-button,
+  html::-webkit-scrollbar-button:single-button,
+  body::-webkit-scrollbar-button:single-button,
+  html::-webkit-scrollbar-button:start,
+  body::-webkit-scrollbar-button:start,
+  html::-webkit-scrollbar-button:end,
+  body::-webkit-scrollbar-button:end,
+  html::-webkit-scrollbar-button:vertical:decrement,
+  body::-webkit-scrollbar-button:vertical:decrement,
+  html::-webkit-scrollbar-button:vertical:increment,
+  body::-webkit-scrollbar-button:vertical:increment,
+  html::-webkit-scrollbar-button:single-button:vertical:decrement,
+  body::-webkit-scrollbar-button:single-button:vertical:decrement,
+  html::-webkit-scrollbar-button:single-button:vertical:increment,
+  body::-webkit-scrollbar-button:single-button:vertical:increment,
+  html::-webkit-scrollbar-button:single-button:vertical:start:decrement,
+  body::-webkit-scrollbar-button:single-button:vertical:start:decrement,
+  html::-webkit-scrollbar-button:single-button:vertical:end:increment,
+  body::-webkit-scrollbar-button:single-button:vertical:end:increment {
+    display: block;
+    appearance: none;
+    -webkit-appearance: none;
+    width: 0;
+    height: 0;
+    min-height: 0;
+    background: transparent;
+    background-image: none;
+    border: 0;
+    box-shadow: none;
+    margin: 0;
+    padding: 0;
+  }
+}
+
+
+
+/* ── HEADER ──────────────────────────────────────────── */
+.oav-header {
+  position: fixed;
+  top: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(calc(100% - 3rem), 1240px);
+  z-index: 40;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.20);
+  border-radius: 14px;
+  backdrop-filter: blur(28px) saturate(160%);
+  -webkit-backdrop-filter: blur(28px) saturate(160%);
+  transition: background 0.35s, border-color 0.35s, box-shadow 0.35s;
+  box-shadow:
+    0 2px 12px rgba(0, 0, 0, 0.14),
+    0 8px 32px rgba(0, 0, 0, 0.10),
+    inset 0 1px 0 rgba(255, 255, 255, 0.28),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.04);
+}
+
+.oav-header::before,
+.oav-header::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+}
+
+.oav-header::before {
+  background: linear-gradient(128deg,
+      rgba(255, 255, 255, 0.10) 0%,
+      transparent 50%);
+  opacity: 1;
+}
+
+.oav-header::after {
+  inset: 1px;
+  border-radius: inherit;
+  background: linear-gradient(180deg,
+      rgba(255, 255, 255, 0.05) 0%,
+      transparent 50%);
+  opacity: 1;
+}
+
+.oav-header.is-scrolled {
+  background: rgba(255, 255, 255, 0.75);
+  border-color: rgba(255, 255, 255, 0.58);
+  box-shadow:
+    0 2px 10px rgba(7, 17, 31, 0.08),
+    0 10px 36px rgba(7, 17, 31, 0.13),
+    inset 0 1px 0 rgba(255, 255, 255, 0.96),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.03);
+}
+
+/* nav + brand text: white over dark hero, dark once scrolled over light sections */
+.oav-header.is-scrolled .oav-nav a {
+  color: var(--muted-strong);
+}
+
+.oav-header.is-scrolled .oav-nav a:hover,
+.oav-header.is-scrolled .oav-nav a.is-active {
+  color: var(--off);
+}
+
+.oav-header.is-scrolled .oav-brand-copy strong {
+  color: var(--off);
+}
+
+.oav-header.is-scrolled .oav-brand-copy span {
+  color: var(--blue);
+}
+
+.oav-header-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: var(--oav-header-height);
+  gap: 2rem;
+  position: relative;
+  overflow: visible;
+  z-index: 1;
+}
+
+.oav-brand {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.oav-brand img {
+  width: clamp(72px, 8vw, 100px);
+}
+
+.oav-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.oav-header-quote {
+  min-height: 38px;
+  padding: 10px 20px;
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.6px;
+  line-height: 16px;
+  text-transform: uppercase;
+}
+
+.oav-brand-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.oav-brand-copy strong {
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.90);
+  white-space: nowrap;
+}
+
+.oav-brand-copy span {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  color: var(--blue);
+  white-space: nowrap;
+}
+
+.oav-nav {
+  display: flex;
+  align-items: center;
+  gap: 36px;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.oav-nav a {
+  position: relative;
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.80);
+  transition: color 0.2s;
+}
+
+.oav-nav a::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: -4px;
+  width: 100%;
+  height: 1px;
+  background: var(--blue);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.2s;
+}
+
+.oav-nav a:hover,
+.oav-nav a.is-active {
+  color: #ffffff;
+}
+
+.oav-nav a:hover::after,
+.oav-nav a.is-active::after {
+  transform: scaleX(1);
+}
+
+.oav-nav-quote {
+  display: none !important;
+}
+
+.oav-nav-drawer {
+  display: none;
+}
+
+.oav-nav-backdrop {
+  position: fixed;
+  inset: 0;
+  padding: 0;
+  border: none;
+  background: rgba(242, 247, 252, 0.04);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  z-index: 30;
+  transition: opacity 0.28s ease, visibility 0.28s ease, backdrop-filter 0.28s ease;
+}
+
+.oav-menu-toggle {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  background: transparent;
+  border: none;
+  color: var(--blue);
+}
+
+.oav-menu-toggle:focus-visible {
+  outline: 2px solid rgba(26, 127, 212, 0.38);
+  outline-offset: 4px;
+  border-radius: 999px;
+}
+
+.oav-menu-toggle-icon {
+  position: relative;
+  display: inline-flex;
+  width: 26px;
+  height: 20px;
+}
+
+.oav-menu-toggle-bar {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  border-radius: 999px;
+  background: #02AFF2;
+  box-shadow: none;
+  transform-origin: center;
+  transition: transform 0.28s ease, opacity 0.24s ease, top 0.28s ease, width 0.28s ease;
+}
+
+.oav-menu-toggle-bar:nth-child(1) {
+  top: 1px;
+}
+
+.oav-menu-toggle-bar:nth-child(2) {
+  top: 9px;
+}
+
+.oav-menu-toggle-bar:nth-child(3) {
+  top: 17px;
+}
+
+.oav-menu-toggle.is-open .oav-menu-toggle-bar:nth-child(1) {
+  top: 9px;
+  transform: rotate(45deg);
+}
+
+.oav-menu-toggle.is-open .oav-menu-toggle-bar:nth-child(2) {
+  opacity: 0;
+  width: 60%;
+  transform: translateX(5px);
+}
+
+.oav-menu-toggle.is-open .oav-menu-toggle-bar:nth-child(3) {
+  top: 9px;
+  transform: rotate(-45deg);
+}
+
+/* ── HERO ────────────────────────────────────────────── */
+.oav-hero-section,
+.oav-section {
+  scroll-margin-top: calc(var(--oav-header-height) + 0.5rem);
+}
+
+.oav-hero-section {
+  position: relative;
+  min-height: 100dvh;
+  padding-top: calc(var(--oav-header-height) + 56px);
+  padding-bottom: 15px;
+  overflow: hidden;
+  background: var(--oav-blue-gradient-surface);
+}
+
+/* BG image layer */
+.oav-hero-section::before {
+  content: none;
+}
+
+/* gradient veil — image stays visible, only bottom fades */
+.oav-hero-section::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg,
+      rgba(255, 255, 255, 0.18) 0%,
+      rgba(255, 255, 255, 0.08) 18%,
+      rgba(255, 255, 255, 0) 38%),
+    radial-gradient(circle at 16% 18%,
+      rgba(255, 255, 255, 0.20) 0%,
+      rgba(255, 255, 255, 0) 34%),
+    radial-gradient(circle at 86% 12%,
+      rgba(255, 255, 255, 0.16) 0%,
+      rgba(255, 255, 255, 0) 28%);
+  z-index: 1;
+}
+
+.oav-hero-layout {
+  position: relative;
+  z-index: 3;
+  min-height: calc(100svh - var(--oav-header-height));
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding-block: 0 56px;
+}
+
+.oav-hero-grid {
+  width: 100%;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(320px, 430px);
+  gap: clamp(32px, 5vw, 88px);
+  align-items: end;
+}
+
+.oav-hero-copy {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0;
+  min-width: 0;
+  max-width: 600px;
+}
+
+.oav-hero-visual {
+  display: flex;
+  justify-content: flex-end;
+  align-items: flex-end;
+  min-width: 0;
+}
+
+.oav-hero-stack {
+  position: relative;
+  width: min(100%, 430px);
+  aspect-ratio: 0.88;
+  isolation: isolate;
+  perspective: 1800px;
+  transform: translate(-45px, -50px);
+}
+
+.oav-hero-stack-glass {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  transform: translate(20px, 28px) rotate(5deg);
+}
+
+.oav-hero-stack-glass::before,
+.oav-hero-stack-glass::after {
+  content: '';
+  position: absolute;
+  border-radius: 16px;
+}
+
+.oav-hero-stack-glass::before {
+  inset: 1% 5% 5% 3%;
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.26) 0%, rgba(255, 255, 255, 0.12) 20%, rgba(255, 255, 255, 0.04) 42%, rgba(255, 255, 255, 0.10) 100%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.12) 0%, rgba(115, 193, 255, 0.10) 52%, rgba(255, 255, 255, 0.04) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.34);
+  box-shadow:
+    0 24px 50px rgba(7, 30, 58, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.28),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(18px) saturate(150%);
+  -webkit-backdrop-filter: blur(18px) saturate(150%);
+}
+
+.oav-hero-stack-glass::after {
+  inset: 1% 5% 5% 3%;
+  background:
+    linear-gradient(132deg, rgba(255, 255, 255, 0.34) 0%, rgba(255, 255, 255, 0.16) 12%, rgba(255, 255, 255, 0.06) 18%, rgba(255, 255, 255, 0) 30%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.06) 0%, rgba(15, 15, 15, 0.10) 100%);
+}
+
+.oav-hero-stack-card {
+  position: absolute;
+  inset: 0;
+  border-radius: 12px;
+  overflow: visible;
+  z-index: var(--stack-z);
+  transform: translate(var(--stack-x), var(--stack-y)) rotate(var(--stack-rotate)) scale(var(--stack-scale));
+  transition: transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: transform;
+}
+
+.oav-hero-stack-card-inner {
+  position: absolute;
+  inset: 5% 11% 11% 7%;
+  border-radius: inherit;
+  transform-style: preserve-3d;
+  transition: transform 1.8s cubic-bezier(0.45, 0, 0.2, 1);
+  will-change: transform;
+}
+
+.oav-hero-stack-face {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  border-radius: inherit;
+  backface-visibility: hidden;
+  background: transparent;
+  border: none;
+  box-shadow: 0 28px 54px rgba(10, 38, 67, 0.22);
+}
+
+.oav-hero-stack-face::before,
+.oav-hero-stack-face::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+
+.oav-hero-stack-face::before {
+  background:
+    linear-gradient(
+      132deg,
+      rgba(255, 255, 255, 0.42) 0%,
+      rgba(255, 255, 255, 0.22) 11%,
+      rgba(255, 255, 255, 0.08) 18%,
+      rgba(255, 255, 255, 0) 31%
+    ),
+    linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.16) 0%,
+      rgba(255, 255, 255, 0.06) 10%,
+      rgba(255, 255, 255, 0) 22%
+    );
+  pointer-events: none;
+}
+
+.oav-hero-stack-face::after {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.03) 0%, rgba(15, 15, 15, 0.12) 100%);
+  pointer-events: none;
+}
+
+.oav-hero-stack-face--back {
+  transform: rotateY(180deg);
+}
+
+.oav-hero-stack-face img {
+  position: relative;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+}
+
+.oav-hero-stack-badge {
+  position: absolute;
+  left: -24px;
+  bottom: 24px;
+  z-index: 9;
+  display: grid;
+  align-content: center;
+  gap: 6px;
+  width: min(220px, calc(100% - 18px));
+  padding: 18px 22px;
+  min-height: 124px;
+  border-radius: 26px;
+  background: #ffffff;
+  color: var(--blue);
+  box-shadow: 0 18px 42px rgba(6, 42, 79, 0.22);
+  pointer-events: none;
+  isolation: isolate;
+  animation: oav-stack-badge-bounce 3.4s ease-in-out infinite;
+}
+
+.oav-hero-stack-badge::after {
+  content: '';
+  position: absolute;
+  inset: 3px;
+  border: 1px solid rgba(26, 127, 212, 0.56);
+  border-radius: 23px;
+  pointer-events: none;
+}
+
+.oav-hero-stack-badge span {
+  position: relative;
+  z-index: 1;
+  display: block;
+  font-family: var(--mono);
+  font-size: clamp(13px, 1.55vw, 17px);
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  line-height: 1.45;
+  text-wrap: balance;
+}
+
+/* hide eyebrow — noisy */
+.oav-eyebrow {
+  display: none !important;
+}
+
+.oav-hero-kicker {
+  display: block;
+  margin: 0 0 14px;
+  font-family: var(--mono);
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: rgba(255, 255, 255, 0.92);
+}
+
+.oav-hero-kicker-mobile-line {
+  display: inline;
+}
+
+.oav-hero-kicker-mobile-line + .oav-hero-kicker-mobile-line::before {
+  content: ' ';
+}
+
+.oav-section-intro>span:first-child {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  width: fit-content;
+  margin: 0 0 18px;
+  font-family: var(--mono);
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: 0.25em;
+  line-height: 1;
+  text-transform: uppercase;
+  color: #4FC3F7;
+}
+
+.oav-section-intro>span:first-child::before {
+  content: '';
+  display: block;
+  flex: 0 0 16px;
+  width: 16px;
+  height: 56px;
+  background: currentColor;
+}
+
+.oav-hero-kicker--compact {
+  font-size: 16px;
+  white-space: nowrap;
+}
+
+.oav-hero-slide {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.oav-hero-slide h1 {
+  margin: 0 0 14px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  min-height: 1.8em;
+  font-family: var(--bebas);
+  font-size: clamp(56px, 9vw, 108px);
+  font-weight: 500;
+  line-height: 0.9;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: #ffffff;
+  text-shadow: 0 12px 30px rgba(5, 43, 81, 0.18);
+}
+
+.oav-hero-slide h1>span {
+  display: block;
+}
+
+.oav-hero-type-line {
+  display: inline-flex;
+  align-items: flex-end;
+}
+
+.oav-hero-type-line .oav-hero-type-cursor {
+  display: inline-block;
+  width: 0.09em;
+  height: 0.82em;
+  margin-left: 0.08em;
+  background: currentColor;
+  vertical-align: -0.08em;
+  box-shadow: 0 0 12px rgba(255, 255, 255, 0.18);
+  animation: oav-type-cursor 1s steps(1, end) infinite;
+}
+
+@keyframes oav-type-cursor {
+
+  0%,
+  48% {
+    opacity: 1;
+  }
+
+  50%,
+  100% {
+    opacity: 0;
+  }
+}
+
+.oav-hero-description {
+  margin: 0 0 32px;
+  min-height: calc(3 * 1.65em);
+  font-family: var(--sans);
+  font-size: 18px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.88);
+  max-width: 430px;
+  line-height: 1.65;
+  text-shadow: none;
+}
+
+.oav-hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+/* Slide nav tabs */
+.oav-slide-nav {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1px;
+  background: var(--line);
+  width: 100%;
+  max-width: 520px;
+  margin-top: 52px;
+}
+
+.oav-slide-nav button {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 14px 16px;
+  text-align: left;
+  background: rgba(255, 255, 255, 0.68);
+  border: none;
+  border-radius: 0;
+  border-bottom: 2px solid transparent;
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.oav-slide-nav button span {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 3px;
+  color: var(--blue);
+  text-transform: uppercase;
+}
+
+.oav-slide-nav button strong {
+  font-family: var(--bebas);
+  font-size: 16px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--muted-strong);
+}
+
+.oav-slide-nav button small {
+  font-size: 11px;
+  color: var(--muted);
+  display: none;
+  /* keep it tight */
+}
+
+.oav-slide-nav button:hover,
+.oav-slide-nav button.is-active {
+  background: rgba(255, 255, 255, 0.9);
+  border-bottom-color: var(--blue);
+}
+
+.oav-slide-nav button.is-active strong {
+  color: var(--off);
+}
+
+/* hero side — eliminated */
+.oav-hero-stack:hover .oav-hero-stack-card {
+  transform: translate(var(--stack-hover-x), var(--stack-hover-y)) rotate(var(--stack-hover-rotate)) scale(var(--stack-scale));
+}
+
+.oav-hero-stack-card.is-flipping .oav-hero-stack-card-inner {
+  transform: rotateY(180deg);
+}
+
+@keyframes oav-stack-badge-bounce {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-7px);
+  }
+}
+
+@media (width <=1080px) {
+  .oav-hero-grid {
+    grid-template-columns: minmax(0, 1fr) minmax(260px, 340px);
+    gap: 32px;
+  }
+
+  .oav-hero-stack {
+    width: min(100%, 340px);
+    transform: translate(-45px, -50px);
+  }
+}
+
+@media (width <=760px) {
+  .oav-hero-grid {
+    grid-template-columns: 1fr;
+    gap: 28px;
+  }
+
+  .oav-hero-copy {
+    max-width: 100%;
+    min-height: calc(100svh - var(--oav-header-height) - 48px);
+    justify-content: flex-end;
+  }
+
+  .oav-hero-visual {
+    justify-content: center;
+  }
+
+  .oav-hero-stack {
+    width: min(100%, 320px);
+    transform: translate(-6px, -18px);
+  }
+
+  .oav-hero-stack-glass {
+    transform: translate(12px, 20px) rotate(4deg);
+  }
+
+  .oav-hero-stack-card-inner {
+    inset: 6% 11% 12% 9%;
+  }
+
+  .oav-hero-stack-badge {
+    left: -28px;
+    bottom: 16px;
+    width: min(194px, calc(100% - 10px));
+    padding: 15px 18px;
+    min-height: 102px;
+    border-radius: 22px;
+  }
+
+  .oav-hero-stack-badge::after {
+    border-radius: 19px;
+  }
+
+  .oav-hero-stack-badge span {
+    font-size: 13px;
+    letter-spacing: 0.12em;
+    line-height: 1.4;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .oav-hero-stack-card {
+    transition: none;
+  }
+
+  .oav-hero-stack-card-inner {
+    transition: none;
+  }
+
+  .oav-hero-stack-badge {
+    animation: none;
+  }
+}
+
+/* hero bottom strip */
+.oav-hero-bottom {
+  position: relative;
+  z-index: 3;
+  padding: 28px 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.20);
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+
+.oav-hero-lineup-band {
+  flex: 1 1 100%;
+  min-width: 0;
+  overflow: hidden;
+  background: #ffffff;
+  border: 1px solid rgba(26, 127, 212, 0.28);
+  box-shadow: 0 18px 36px rgba(6, 73, 132, 0.14);
+}
+
+.oav-hero-lineup-track {
+  display: flex;
+  align-items: center;
+  width: max-content;
+  animation: oav-marquee 24s linear infinite;
+}
+
+.oav-hero-lineup-track.is-static {
+  width: 100%;
+  flex-wrap: wrap;
+  animation: none;
+}
+
+.oav-hero-lineup-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 22px;
+  border-right: 1px solid rgba(26, 127, 212, 0.24);
+  color: var(--blue);
+  white-space: nowrap;
+}
+
+.oav-hero-lineup-item span:last-child {
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.oav-hero-lineup-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  color: var(--blue);
+}
+
+.oav-hero-lineup-icon svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.6;
+  stroke-linecap: square;
+  stroke-linejoin: miter;
+}
+
+.oav-hero-stats {
+  display: flex;
+  gap: 40px;
+  flex-wrap: wrap;
+}
+
+.oav-hero-stats article {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.oav-hero-stats strong,
+.oav-metric-item strong {
+  font-family: var(--bebas);
+  font-size: clamp(28px, 3vw, 40px);
+  line-height: 1;
+  color: var(--blue);
+}
+
+.oav-hero-stats span,
+.oav-metric-item span {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+@keyframes oav-marquee {
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+/* ── WAVE DIVIDER ────────────────────────────────────── */
+.oav-hero-wave {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  z-index: 2;
+  display: block;
+  width: 100%;
+  line-height: 0;
+  pointer-events: none;
+}
+
+.oav-hero-wave::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 2px;
+  background: #f5f5f3;
+}
+
+.oav-hero-wave svg {
+  display: block;
+  width: 100%;
+  height: 450px;
+}
+
+/* ── BUTTONS ─────────────────────────────────────────── */
+.oav-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 46px;
+  padding: 12px 26px;
+  border: 1px solid var(--line-strong);
+  border-radius: 0;
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  transition: background 0.2s, border-color 0.2s, color 0.2s;
+}
+
+.oav-button--primary {
+  background: var(--blue);
+  border-color: var(--blue);
+  color: #fff;
+}
+
+.oav-button--primary:hover {
+  background: #1565c0;
+  border-color: #1565c0;
+}
+
+.oav-button.oav-header-quote {
+  min-height: 38px;
+  padding: 10px 20px;
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.6px;
+  line-height: 16px;
+  text-transform: uppercase;
+}
+
+.oav-button--secondary {
+  background: transparent;
+  color: var(--off);
+}
+
+.oav-button--secondary:hover {
+  border-color: var(--blue);
+  color: var(--blue);
+}
+
+.oav-button--hero-outline {
+  min-width: 184px;
+  padding-inline: 30px;
+  border-color: rgba(255, 255, 255, 0.72);
+  color: #ffffff;
+  letter-spacing: 0.42em;
+  background: rgba(255, 255, 255, 0.08);
+  text-shadow: none;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.14);
+}
+
+.oav-button--hero-outline:hover {
+  border-color: #ffffff;
+  color: var(--blue);
+  background: #ffffff;
+}
+
+.oav-button--hero-outline:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.88);
+  outline-offset: 3px;
+}
+
+.oav-hero-actions .oav-button--primary {
+  background: #ffffff;
+  border-color: #ffffff;
+  color: var(--blue);
+  box-shadow: 0 16px 32px rgba(6, 73, 132, 0.18);
+}
+
+.oav-hero-actions .oav-button--primary:hover {
+  background: rgba(255, 255, 255, 0.92);
+  border-color: rgba(255, 255, 255, 0.92);
+  color: #156ab1;
+}
+
+/* ── SECTIONS ────────────────────────────────────────── */
+.oav-section {
+  position: relative;
+  padding-block: 96px;
+  /* NO border-top by default — sections flow into each other */
+}
+
+/* ── STACKING LAYERS ──────────────────────────────────────
+   JS (useScrollStack) sets position:fixed + translateY at
+   runtime. These rules provide fallback z-index and solid
+   backgrounds so nothing bleeds through during transitions.
+────────────────────────────────────────────────────────── */
+#home {
+  z-index: 2;
+}
+
+#about {
+  z-index: 3;
+  background: #f5f5f3;
+}
+
+#services {
+  z-index: 4;
+  background: #ffffff;
+}
+
+#portfolio {
+  z-index: 5;
+}
+
+#reviews {
+  z-index: 6;
+  background: #efefed;
+}
+
+#contact {
+  z-index: 7;
+  background: #f5f5f3;
+}
+
+/* subtle bg shifts for rhythm */
+.oav-section--deep {
+  background: #f5f5f3;
+}
+
+.oav-section--deep>.oav-shell {
+  padding-top: 40px;
+}
+
+.oav-section--steel {
+  background: #ffffff;
+}
+
+.oav-section--dark {
+  background: #efefed;
+}
+
+.oav-section--contact {
+  background: #f5f5f3;
+}
+
+#portfolio.oav-section {
+  background: #1A7FD4;
+  border-top-color: rgba(255, 255, 255, 0.12);
+  overflow: hidden;
+  isolation: isolate;
+}
+
+#portfolio.oav-section::before,
+#portfolio.oav-section::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+#portfolio.oav-section::before,
+#portfolio.oav-section::after {
+  background: none;
+  opacity: 0;
+}
+
+#portfolio .oav-shell {
+  position: relative;
+  z-index: 1;
+}
+
+/* hairline only between sections that need a visual break */
+.oav-section--steel,
+.oav-section--dark,
+.oav-section--contact {
+  border-top: 1px solid var(--line);
+}
+
+/* ── SECTION INTRO ───────────────────────────────────── */
+.oav-section-intro {
+  max-width: 760px;
+  margin-bottom: 64px;
+}
+
+.oav-section-intro--center {
+  text-align: center;
+  margin-inline: auto;
+}
+
+#portfolio .oav-section-intro h2 {
+  color: #ffffff;
+}
+
+#portfolio .oav-section-intro p {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+#portfolio .oav-section-intro>span:first-child {
+  position: relative;
+  isolation: isolate;
+  padding-block: 10px;
+}
+
+#portfolio .oav-section-intro>span:first-child::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: -100vmax;
+  right: -100vmax;
+  z-index: -1;
+  background: #ffffff;
+  pointer-events: none;
+}
+
+.oav-section-intro h2,
+.oav-contact-copy h2 {
+  margin: 0 0 18px;
+  font-family: var(--bebas);
+  font-size: clamp(44px, 6vw, 76px);
+  line-height: 0.95;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--off);
+}
+
+.oav-section-intro p,
+.oav-contact-copy p {
+  margin: 0;
+  font-family: var(--sans);
+  font-size: 14px;
+  font-weight: 300;
+  color: var(--muted-strong);
+  line-height: 1.8;
+  max-width: 540px;
+}
+
+/* ── ABOUT ───────────────────────────────────────────── */
+.oav-about-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1px;
+  background: var(--line);
+  border-radius: 16px 16px 0 0;
+  overflow: hidden;
+}
+
+/* kill the card look completely */
+.oav-card,
+.oav-contact-band {
+  background: transparent;
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  padding: 0;
+}
+
+.oav-about-story {
+  padding: 40px 48px 32px;
+  background: #f5f5f3;
+}
+
+.oav-about-visual {
+  min-height: 340px;
+  display: flex;
+  align-items: flex-end;
+  background:
+    linear-gradient(rgba(0, 0, 0, 0.55) 0%, rgba(0, 0, 0, 0.55) 100%),
+    url('https://images.unsplash.com/photo-1600047509807-ba8f99d2cdde?auto=format&fit=crop&w=1200&q=80') center / cover no-repeat;
+}
+
+.oav-visual-stack {
+  width: 100%;
+  padding: 40px 48px;
+}
+
+.oav-about-visual .oav-visual-stack .oav-card-tag {
+  color: rgba(255, 255, 255, 0.9);
+  background: rgba(78, 144, 255, 0.8);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  padding-inline: 8px;
+  border-radius: 3px;
+}
+
+.oav-about-visual .oav-visual-stack h3 {
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 26px;
+  text-transform: uppercase;
+  line-height: 1.05;
+}
+
+.oav-about-visual .oav-visual-stack p {
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 16px;
+  line-height: 1.75;
+}
+
+.oav-about-story p,
+.oav-about-visual p,
+.oav-principle-card p,
+.oav-service-card p,
+.oav-portfolio-body p,
+.oav-brand-panel p {
+  font-family: var(--sans);
+  font-size: 14px;
+  font-weight: 300;
+  color: var(--muted-strong);
+  line-height: 1.8;
+}
+
+.oav-rail-list,
+.oav-service-card ul {
+  margin: 24px 0 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 10px;
+}
+
+.oav-rail-list li,
+.oav-service-card li {
+  position: relative;
+  padding-left: 18px;
+  font-family: var(--sans);
+  font-size: 13px;
+  font-weight: 300;
+  color: var(--muted-strong);
+}
+
+.oav-rail-list li::before,
+.oav-service-card li::before {
+  content: '';
+  position: absolute;
+  top: 8px;
+  left: 0;
+  width: 9px;
+  height: 1px;
+  background: var(--blue);
+}
+
+.oav-card-tag,
+.oav-card-index {
+  display: inline-block;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--blue);
+  margin-bottom: 10px;
+}
+
+.oav-about-visual h3,
+.oav-principle-card h3,
+.oav-service-card h3,
+.oav-portfolio-body h3 {
+  font-family: var(--bebas);
+  font-size: 26px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  line-height: 1.05;
+  color: var(--off);
+  margin: 0 0 10px;
+}
+
+/* ── METRIC STRIP ────────────────────────────────────── */
+.oav-metric-strip {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1px;
+  background: var(--line);
+  margin-top: 64px;
+}
+
+.oav-metric-item {
+  background: #f5f5f3;
+  padding: 36px 28px;
+  border-radius: 0;
+  border: none;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-end;
+  gap: 4px;
+}
+
+.oav-metric-strip--about {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin-top: 28px;
+}
+
+.oav-metric-strip--about .oav-metric-item {
+  min-height: 92px;
+  padding: 22px 20px;
+}
+
+.oav-metric-strip--about .oav-metric-item span {
+  font-weight: 800;
+}
+
+/* ── PRINCIPLES ──────────────────────────────────────── */
+.oav-principle-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0;
+  background: #1A7FD4;
+  margin-top: 0;
+}
+
+.oav-principle-viewport {
+  overflow: visible;
+}
+
+.oav-principle-card {
+  background: #1A7FD4;
+  padding: 44px 40px;
+  border-radius: 0 !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+.oav-principle-dots {
+  display: none;
+}
+
+.oav-principle-card .oav-card-index {
+  color: #ffffff;
+  font-size: 20px;
+  font-weight: 800;
+}
+
+.oav-principle-card h3 {
+  color: #ffffff;
+}
+
+/* ── SERVICES ────────────────────────────────────────── */
+.oav-services-grid {
+  display: grid;
+  gap: 1px;
+  background: var(--line);
+}
+
+.oav-services-stage--mobile {
+  display: none;
+}
+
+/* Row-based service layout — not cards */
+.oav-service-row {
+  display: grid;
+  grid-template-columns: 80px 1fr 1fr;
+  gap: 0;
+  align-items: start;
+  background: #ffffff;
+  padding: 40px 0;
+  border-bottom: 1px solid var(--line);
+  transition: background 0.2s;
+}
+
+.oav-service-row:last-child {
+  border-bottom: none;
+}
+
+.oav-service-row:hover {
+  background: #f5f5f3;
+}
+
+.oav-service-no {
+  font-family: var(--bebas);
+  font-size: 52px;
+  color: var(--blue);
+  line-height: 1;
+  padding-left: 0;
+  padding-top: 4px;
+}
+
+.oav-service-head {
+  padding-right: 40px;
+}
+
+.oav-service-head h3 {
+  font-family: var(--bebas);
+  font-size: 28px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--off);
+  margin: 0 0 10px;
+}
+
+.oav-service-head p {
+  font-family: var(--sans);
+  font-size: 14px;
+  font-weight: 300;
+  color: var(--muted-strong);
+  line-height: 1.7;
+  margin: 0;
+}
+
+.oav-service-points {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 9px;
+}
+
+.oav-service-points li {
+  position: relative;
+  padding-left: 18px;
+  font-family: var(--sans);
+  font-size: 13px;
+  font-weight: 300;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+.oav-service-points li::before {
+  content: '';
+  position: absolute;
+  top: 8px;
+  left: 0;
+  width: 9px;
+  height: 1px;
+  background: var(--blue);
+}
+
+.oav-services-stage {
+  position: relative;
+}
+
+.oav-services-rail {
+  display: flex;
+  gap: 18px;
+  overflow-x: auto;
+  padding: 0 1rem 8px;
+  scroll-padding-inline: 1rem;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.oav-services-rail::-webkit-scrollbar {
+  display: none;
+}
+
+.oav-service-mobile-card {
+  flex: 0 0 min(84vw, 332px);
+  min-width: min(84vw, 332px);
+  scroll-snap-align: center;
+  display: grid;
+  gap: 14px;
+  padding: 30px 24px;
+  background: #f5f5f3;
+}
+
+.oav-service-mobile-card .oav-card-index {
+  margin-bottom: 0;
+  font-size: 26px;
+  font-weight: 800;
+  letter-spacing: 1px;
+}
+
+.oav-service-mobile-card h3 {
+  margin: 0;
+  font-family: var(--bebas);
+  font-size: 30px;
+  line-height: 0.95;
+  letter-spacing: 1.8px;
+  text-transform: uppercase;
+  color: var(--off);
+}
+
+.oav-service-mobile-card {
+  scroll-snap-align: center;
+  background: #f5f5f3;
+  flex: 0 0 min(84vw, 332px);
+  min-width: min(84vw, 332px);
+  padding: 30px 24px;
+  display: grid;
+  gap: 14px;
+}
+
+.oav-service-mobile-card .oav-card-index {
+  letter-spacing: 1px;
+  margin-bottom: 0;
+  font-size: 26px;
+  font-weight: 800;
+}
+
+.oav-service-mobile-card h3 {
+  font-family: var(--bebas);
+  font-size: 30px;
+  line-height: 0.95;
+  letter-spacing: 1.8px;
+  text-transform: uppercase;
+  color: var(--off);
+  margin: 0;
+}
+
+.oav-service-mobile-card p {
+  font-family: var(--sans);
+  font-size: 15px;
+  font-weight: 400;
+  color: rgba(15, 15, 15, 0.72);
+  margin: 0;
+  line-height: 1.75;
+}
+
+.oav-service-mobile-points {
+  list-style: none;
+  padding: 0;
+  margin: 4px 0 0;
+  display: grid;
+  gap: 12px;
+}
+
+.oav-service-mobile-points li {
+  position: relative;
+  padding-left: 18px;
+  font-family: var(--sans);
+  font-size: 14px;
+  font-weight: 400;
+  color: rgba(15, 15, 15, 0.68);
+  line-height: 1.65;
+}
+
+.oav-service-mobile-points li::before {
+  content: '';
+  position: absolute;
+  top: 10px;
+  left: 0;
+  width: 9px;
+  height: 1px;
+  background: var(--blue);
+}
+
+.oav-services-arrow {
+  position: absolute;
+  top: 42%;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  background: rgba(255, 255, 255, 0.86);
+  border: 1px solid rgba(15, 15, 15, 0.10);
+  border-radius: 999px;
+  color: var(--off);
+  backdrop-filter: blur(14px);
+  transition: transform 0.2s, background 0.2s, border-color 0.2s, opacity 0.2s;
+  box-shadow: 0 18px 35px rgba(0, 0, 0, 0.18);
+}
+
+.oav-services-arrow svg {
+  width: 20px;
+  height: 20px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.oav-services-arrow--left {
+  left: 0;
+  transform: translateY(-50%);
+}
+
+.oav-services-arrow--right {
+  right: 0;
+  transform: translateY(-50%);
+}
+
+.oav-services-arrow:hover:not(:disabled) {
+  background: var(--blue);
+  border-color: var(--blue);
+  color: #fff;
+}
+
+.oav-services-arrow:focus-visible {
+  outline: 2px solid var(--blue);
+  outline-offset: 3px;
+}
+
+.oav-services-arrow:disabled {
+  opacity: 0.32;
+  cursor: default;
+}
+
+/* -- PORTFOLIO ----------------------------------------- */
+.oav-portfolio-stage {
+  position: relative;
+  background: transparent;
+  box-shadow: none;
+}
+
+.oav-portfolio-stage::before,
+.oav-portfolio-stage::after {
+  content: none;
+  display: none;
+}
+
+.oav-portfolio-rail {
+  display: flex;
+  gap: 24px;
+  background: none;
+  padding: 18px clamp(1.4rem, 4vw, 4.5rem) 24px;
+  scroll-padding-inline: clamp(1.4rem, 4vw, 4.5rem);
+  scroll-snap-type: none;
+  overflow-x: auto;
+  overflow-y: hidden;
+  overscroll-behavior-x: contain;
+  overscroll-behavior-y: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  outline: none;
+}
+
+.oav-portfolio-rail::-webkit-scrollbar {
+  display: none;
+}
+
+.oav-portfolio-card {
+  position: relative;
+  flex: 0 0 clamp(260px, 29vw, 336px);
+  overflow: hidden;
+  background: #efefed;
+  transform: translateY(0);
+  transition: background 0.3s, box-shadow 0.3s;
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow: 0 10px 24px rgba(7, 22, 40, 0.12) !important;
+}
+
+.oav-portfolio-card::after {
+  content: none;
+}
+
+.oav-portfolio-card-hit {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: transparent;
+  border: 0;
+  padding: 0;
+  text-align: left;
+  cursor: pointer;
+  color: inherit;
+  z-index: 2;
+}
+
+.oav-portfolio-media {
+  aspect-ratio: 1.36;
+  overflow: hidden;
+  background: #e8e8e4;
+}
+
+.oav-portfolio-media img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s;
+}
+
+.oav-portfolio-card:hover,
+.oav-portfolio-card:focus-within {
+  background: #f5f5f3;
+  box-shadow: 0 14px 30px rgba(7, 22, 40, 0.16) !important;
+}
+
+.oav-portfolio-card:hover .oav-portfolio-media img,
+.oav-portfolio-card:focus-within .oav-portfolio-media img {
+  transform: scale(1.08);
+}
+
+.oav-portfolio-body {
+  display: grid;
+  gap: 6px;
+  padding: 18px 20px 22px;
+  border-top: none;
+}
+
+.oav-portfolio-card-overlay {
+  display: flex;
+  align-items: flex-end;
+  width: 100%;
+  height: 100%;
+  padding: 22px 20px;
+  background: linear-gradient(rgba(4, 11, 22, 0.08) 0%, rgba(4, 11, 22, 0.20) 28%, rgba(4, 11, 22, 0.90) 100%);
+  opacity: 0;
+  transition: opacity 0.28s;
+}
+
+.oav-portfolio-card:hover .oav-portfolio-card-overlay,
+.oav-portfolio-card:focus-within .oav-portfolio-card-overlay {
+  opacity: 1;
+}
+
+.oav-portfolio-card-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 2.6px;
+  text-transform: uppercase;
+  color: #7bd2ff;
+  transition: transform 0.28s, opacity 0.28s;
+  transform: translateY(12px);
+}
+
+.oav-portfolio-card:hover .oav-portfolio-card-cta,
+.oav-portfolio-card:focus-within .oav-portfolio-card-cta {
+  transform: translateY(0);
+}
+
+.oav-portfolio-card-cta svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.oav-portfolio-card-hit:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.9);
+  outline-offset: -2px;
+}
+
+.oav-portfolio-body .oav-card-index {
+  font-family: var(--bebas);
+  font-size: clamp(30px, 3vw, 40px);
+  letter-spacing: 1px;
+  color: var(--off);
+  margin-bottom: 0;
+  line-height: 0.85;
+}
+
+.oav-portfolio-body .oav-card-tag {
+  color: var(--blue);
+  margin: 0;
+}
+
+.oav-portfolio-body h3 {
+  font-family: var(--bebas);
+  font-size: 24px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--off);
+  margin: 0;
+  line-height: 0.95;
+}
+
+.oav-portfolio-body p {
+  color: rgba(15, 15, 15, 0.72);
+  margin: 0;
+  line-height: 1.58;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.oav-portfolio-arrow {
+  position: absolute;
+  top: 37%;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 54px;
+  height: 54px;
+  background: rgba(255, 255, 255, 0.82);
+  border: 1px solid rgba(15, 15, 15, 0.10);
+  border-radius: 999px;
+  color: var(--off);
+  backdrop-filter: blur(14px);
+  transition: transform 0.2s, background 0.2s, border-color 0.2s, opacity 0.2s;
+  box-shadow: 0 18px 35px rgba(0, 0, 0, 0.24);
+}
+
+.oav-portfolio-arrow svg {
+  width: 20px;
+  height: 20px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.oav-portfolio-arrow--left {
+  left: 0;
+  transform: translate(-10px, -50%);
+}
+
+.oav-portfolio-arrow--right {
+  right: 0;
+  transform: translate(10px, -50%);
+}
+
+.oav-portfolio-arrow:hover:not(:disabled) {
+  background: var(--blue);
+  border-color: var(--blue);
+  color: #fff;
+}
+
+.oav-portfolio-arrow:focus-visible {
+  outline: 2px solid var(--blue);
+  outline-offset: 3px;
+}
+
+.oav-portfolio-arrow:disabled {
+  opacity: 0.32;
+  cursor: default;
+}
+
+.oav-portfolio-lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 140;
+  display: grid;
+  place-items: center;
+  padding: clamp(20px, 4vw, 40px);
+  background: rgba(4, 12, 24, 0.78);
+  backdrop-filter: blur(18px) saturate(150%);
+}
+
+.oav-portfolio-lightbox-dialog {
+  position: relative;
+  width: min(94vw, 1380px);
+  max-height: min(92vh, 980px);
+}
+
+.oav-portfolio-lightbox-close {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  background: rgba(6, 17, 31, 0.74);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  color: #fff;
+  backdrop-filter: blur(14px);
+}
+
+.oav-portfolio-lightbox-close:hover {
+  background: rgba(6, 17, 31, 0.90);
+  border-color: rgba(255, 255, 255, 0.28);
+}
+
+.oav-portfolio-lightbox-close svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.oav-portfolio-lightbox-figure {
+  display: grid;
+  gap: 0;
+  margin: 0;
+  overflow: hidden;
+  background: rgba(7, 18, 33, 0.96);
+  box-shadow: 0 34px 80px rgba(0, 0, 0, 0.42);
+}
+
+.oav-portfolio-lightbox-figure img {
+  width: 100%;
+  max-height: min(82vh, 900px);
+  object-fit: contain;
+  background: #04101d;
+}
+
+.oav-portfolio-lightbox-caption {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 22px;
+  background: rgba(4, 12, 24, 0.92);
+}
+
+.oav-portfolio-lightbox-caption strong {
+  font-family: var(--bebas);
+  font-size: clamp(26px, 3vw, 34px);
+  letter-spacing: 1.6px;
+  text-transform: uppercase;
+  color: #fff;
+}
+
+.oav-portfolio-lightbox-caption span {
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 2.6px;
+  text-transform: uppercase;
+  color: #7bd2ff;
+}
+
+/* -- REVIEWS ------------------------------------------- */
+.oav-reviews-marquee {
+  overflow: hidden;
+}
+
+.oav-reviews-track {
+  display: flex;
+  align-items: stretch;
+  gap: 24px;
+  width: max-content;
+  animation: oav-reviews-marquee 96s linear infinite;
+  will-change: transform;
+}
+
+.oav-reviews-marquee:hover .oav-reviews-track {
+  animation-play-state: paused;
+}
+
+.oav-review-card {
+  display: grid;
+  flex: 0 0 360px;
+  gap: 22px;
+  min-height: 100%;
+  padding: 32px 30px 30px;
+  background: #fff;
+  border: 2px solid rgba(26, 127, 212, 0.22);
+  border-radius: 0 22px;
+  transition: transform 0.25s, border-color 0.25s, background 0.25s;
+}
+
+.oav-review-card:hover {
+  border-color: var(--blue);
+  background: #f5f5f3;
+  transform: translateY(-4px);
+}
+
+.oav-review-meta {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid var(--line);
+}
+
+.oav-review-meta .oav-card-tag {
+  margin: 0;
+}
+
+.oav-review-location {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  color: var(--muted);
+  text-align: right;
+}
+
+.oav-review-quote {
+  margin: 0;
+  font-family: var(--sans);
+  font-size: 17px;
+  font-weight: 400;
+  color: var(--off);
+  line-height: 1.75;
+}
+
+.oav-review-client {
+  display: grid;
+  gap: 4px;
+  padding-top: 18px;
+  border-top: 1px solid var(--line);
+}
+
+.oav-review-client strong {
+  font-family: var(--sans);
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--off);
+}
+
+.oav-review-client span {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--blue);
+}
+
+@keyframes oav-reviews-marquee {
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(calc(-50% - 12px));
+  }
+}
+
+/* -- CONTACT ------------------------------------------- */
+.oav-contact-band {
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: 80px;
+  box-shadow: none !important;
+  background: transparent !important;
+  border: none !important;
+  border-radius: 0 !important;
+  padding: 0 !important;
+}
+
+.oav-contact-copy {
+  max-width: 480px;
+}
+
+.oav-contact-copy h2 {
+  margin-bottom: 16px;
+}
+
+.oav-contact-copy p {
+  margin-top: 16px;
+  margin-bottom: 32px;
+}
+
+.oav-contact-form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+  align-content: start;
+}
+
+.oav-field {
+  display: grid;
+  gap: 10px;
+}
+
+.oav-field--full,
+.oav-contact-form-actions {
+  grid-column: 1 / -1;
+}
+
+.oav-field-label {
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--blue);
+}
+
+.oav-contact-input {
+  width: 100%;
+  min-height: 54px;
+  padding: 0 18px;
+  font-family: var(--sans);
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--off);
+  background: #fff;
+  border: 1px solid rgba(26, 127, 212, 0.14);
+  border-radius: 14px;
+  outline: none;
+  appearance: none;
+  transition: border-color 0.2s, box-shadow 0.2s, background 0.2s, color 0.2s;
+}
+
+.oav-contact-input::placeholder {
+  color: rgba(15, 15, 15, 0.34);
+}
+
+.oav-contact-input:focus {
+  border-color: var(--blue);
+  box-shadow: 0 0 0 3px rgba(26, 127, 212, 0.08);
+}
+
+.oav-contact-select {
+  background-image: linear-gradient(45deg, transparent 50%, rgba(15, 15, 15, 0.58) 50%), linear-gradient(135deg, rgba(15, 15, 15, 0.58) 50%, transparent 50%);
+  background-position: calc(100% - 23px) calc(50% - 3px), calc(100% - 17px) calc(50% - 3px);
+  background-repeat: no-repeat;
+  background-size: 6px 6px, 6px 6px;
+  padding-right: 48px;
+}
+
+.oav-contact-textarea {
+  resize: vertical;
+  min-height: 172px;
+  padding: 16px 18px;
+}
+
+.oav-contact-form-actions {
+  display: flex;
+  justify-content: flex-start;
+  padding-top: 6px;
+}
+
+.oav-contact-input:-webkit-autofill,
+.oav-contact-input:-webkit-autofill:hover,
+.oav-contact-input:-webkit-autofill:focus,
+.oav-contact-input:-webkit-autofill:active {
+  -webkit-text-fill-color: var(--off) !important;
+  caret-color: var(--off);
+  border: 1px solid rgba(26, 127, 212, 0.14);
+  box-shadow: inset 0 0 0 1000px #fff !important;
+  transition: background-color 9999s ease-out;
+}
+
+/* -- HERO SUMMARY / BRAND PANEL ------------------------ */
+.oav-brand-panel,
+.oav-hero-summary {
+  display: grid;
+  gap: 16px;
+}
+
+.oav-summary-row {
+  display: grid;
+  gap: 4px;
+}
+
+.oav-summary-row span {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.oav-summary-row strong {
+  font-family: var(--sans);
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--muted-strong);
+}
+
+/* -- FOOTER -------------------------------------------- */
+.oav-footer {
+  position: relative;
+  min-height: 100svh;
+  overflow: hidden;
+  isolation: isolate;
+  color: #fff;
+  background:
+    radial-gradient(circle at 78% 14%, rgba(76, 174, 255, 0.34) 0%, rgba(76, 174, 255, 0.14) 15%, rgba(76, 174, 255, 0) 36%),
+    radial-gradient(circle at 14% 100%, rgba(255, 255, 255, 0.11) 0%, rgba(255, 255, 255, 0) 34%),
+    linear-gradient(118deg, #06264b 0%, #0b4a82 42%, #0b63b6 76%, #08559b 100%);
+  border-top: 1px solid rgba(255, 255, 255, 0.14);
+}
+
+.oav-footer::before,
+.oav-footer::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.oav-footer::before {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0) 18%);
+  opacity: 1;
+}
+
+.oav-footer::after {
+  background: linear-gradient(180deg, rgba(3, 16, 33, 0) 40%, rgba(3, 16, 33, 0.18) 100%);
+  opacity: 1;
+}
+
+.oav-footer-panel {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  gap: 54px;
+  padding-top: calc(var(--oav-header-height) + 116px);
+  padding-bottom: 160px;
+}
+
+.oav-footer-top {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 18px;
+  margin-top: 0;
+  padding: 8px 22px 5px;
+}
+
+.oav-footer-top::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 100vw;
+  transform: translateX(-50%);
+  background: #ffffff;
+  z-index: -1;
+}
+
+.oav-footer-brand {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 72px;
+  padding: 12px 22px;
+  background: transparent;
+  border: none;
+}
+
+.oav-footer-brand img {
+  width: clamp(104px, 10vw, 136px);
+}
+
+.oav-footer-cta {
+  min-width: 208px;
+  min-height: 46px;
+  padding-inline: 24px;
+  border-color: #1a7fd4;
+  border-radius: 4px;
+  background: #1a7fd4;
+  color: #ffffff;
+  font-family: var(--bebas);
+  font-size: 15px;
+  letter-spacing: 0.14em;
+}
+
+.oav-footer-cta:hover {
+  border-color: #156ab1;
+  background: #156ab1;
+  color: #ffffff;
+}
+
+.oav-footer-cta--mobile {
+  display: none;
+}
+
+.oav-footer-main {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+  align-items: start;
+  gap: 58px;
+}
+
+.oav-footer-intro {
+  max-width: 520px;
+  padding-top: 8px;
+}
+
+.oav-footer-heading {
+  margin: 0 0 10px;
+  font-family: var(--bebas);
+  font-size: clamp(64px, 7vw, 92px);
+  letter-spacing: 0.04em;
+  line-height: 0.86;
+  color: #fff;
+}
+
+.oav-footer .oav-footer-kicker {
+  margin: 0 0 18px;
+  font-family: var(--bebas);
+  font-size: clamp(44px, 6vw, 76px);
+  font-weight: 400;
+  letter-spacing: 3px;
+  line-height: 0.95;
+  text-transform: uppercase;
+  color: #ffffff;
+  text-wrap: balance;
+}
+
+.oav-footer .oav-footer-description {
+  max-width: 500px;
+  margin: 0;
+  font-family: var(--bebas);
+  font-size: clamp(18px, 1.5vw, 24px);
+  font-weight: 400;
+  line-height: 1.14;
+  letter-spacing: 0.04em;
+  color: rgba(255, 255, 255, 0.94);
+  text-wrap: pretty;
+}
+
+.oav-footer-columns {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 24px;
+  align-items: start;
+}
+
+.oav-footer-column {
+  min-width: 0;
+}
+
+.oav-footer-column h3 {
+  margin: 0 0 14px;
+  position: relative;
+  display: inline-flex;
+  flex-direction: column;
+  gap: 8px;
+  width: fit-content;
+  font-family: var(--bebas);
+  font-size: 15px;
+  font-weight: 400;
+  letter-spacing: 0.14em;
+  line-height: 1;
+  text-transform: uppercase;
+  color: #fff;
+}
+
+.oav-footer-column h3::after {
+  content: '';
+  display: block;
+  width: 100%;
+  height: 1px;
+  background: currentColor;
+  opacity: 0.34;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.oav-footer-column:hover h3::after {
+  opacity: 0.96;
+  transform: translateY(-1px);
+}
+
+.oav-footer-list {
+  display: grid;
+  gap: 7px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.oav-footer-list a,
+.oav-footer-list span {
+  display: inline-flex;
+  font-family: var(--bebas);
+  font-size: clamp(14px, 1.05vw, 17px);
+  font-weight: 400;
+  letter-spacing: 0.08em;
+  line-height: 1.2;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.96);
+}
+
+.oav-footer-list a {
+  transition: color 0.2s ease;
+}
+
+.oav-footer-list a:hover {
+  color: #fff;
+}
+
+.oav-footer-bottom {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 14px;
+  padding-top: 20px;
+  margin-bottom: 42px;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.oav-footer .oav-footer-copyright {
+  margin: 0;
+  font-family: var(--bebas);
+  font-size: clamp(14px, 1vw, 17px);
+  font-weight: 400;
+  letter-spacing: 0.08em;
+  color: #ffffff;
+}
+
+.oav-footer-backtotop {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--bebas);
+  font-size: 15px;
+  font-weight: 400;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #fff;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.oav-footer-backtotop:hover {
+  color: #fff;
+  opacity: 0.96;
+  transform: translateY(-1px);
+}
+
+.oav-footer-arrow {
+  width: 14px;
+  height: 14px;
+  flex: 0 0 auto;
+}
+
+.oav-footer-monogram {
+  position: absolute;
+  left: 50%;
+  bottom: calc(-0.42em - 30px);
+  z-index: 0;
+  width: min(calc(var(--oav-shell) * 0.9), 92vw);
+  transform: translateX(-50%) scaleX(1.12);
+  transform-origin: center bottom;
+  display: inline-flex;
+  justify-content: center;
+  align-items: flex-end;
+  font-family: var(--montserrat);
+  font-size: clamp(24rem, 38vw, 36rem);
+  font-weight: 400;
+  line-height: 0.78;
+  white-space: nowrap;
+  opacity: 0.94;
+  pointer-events: none;
+  user-select: none;
+}
+
+.oav-footer-monogram-letter {
+  display: inline-block;
+  background: linear-gradient(135deg, #ffffff 30%, #a6cff2 80%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  filter: drop-shadow(0 4px 10px rgba(255, 255, 255, 0.1));
+}
+
+.oav-footer-monogram-letter--o {
+  margin-right: -0.02em;
+}
+
+.oav-footer-monogram-letter + .oav-footer-monogram-letter {
+  margin-left: -0.07em;
+}
+
+/* -- GLOBAL TEXT REFINEMENTS ---------------------------- */
+.oav-about-story p,
+.oav-principle-card p,
+.oav-service-card p,
+.oav-service-head p,
+.oav-portfolio-body p,
+.oav-contact-copy p,
+.oav-section-intro p {
+  color: rgba(15, 15, 15, 0.72);
+  font-size: 15px;
+  font-weight: 400;
+}
+
+.oav-principle-card p {
+  color: rgba(255, 255, 255, 0.90);
+}
+
+.oav-rail-list li,
+.oav-service-card li,
+.oav-service-points li {
+  color: rgba(15, 15, 15, 0.65);
+  font-size: 14px;
+  font-weight: 400;
+}
+
+/* -- RESPONSIVE 1080px --------------------------------- */
+@media (width <=1080px) {
+  .oav-about-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .oav-contact-band {
+    grid-template-columns: 1fr;
+    gap: 48px;
+  }
+
+  .oav-metric-strip,
+  .oav-principle-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .oav-portfolio-rail {
+    gap: 20px;
+    padding-inline: 3rem;
+    scroll-padding-inline: 3rem;
+  }
+
+  .oav-service-row {
+    grid-template-columns: 60px 1fr;
+  }
+
+  .oav-service-points {
+    display: none;
+  }
+
+  .oav-footer-panel {
+    gap: 46px;
+    padding-top: calc(var(--oav-header-height) + 48px);
+    padding-bottom: 166px;
+  }
+
+  .oav-footer-main {
+    grid-template-columns: 1fr;
+    gap: 42px;
+  }
+
+  .oav-footer-columns {
+    gap: 26px;
+  }
+}
+
+/* -- RESPONSIVE 760px ---------------------------------- */
+@media (width <=760px) {
+  :root {
+    --oav-header-height: 45px;
+  }
+
+  .oav-shell {
+    width: min(calc(100% - 1.5rem), var(--oav-shell));
+  }
+
+  .oav-header {
+    overflow: visible;
+  }
+
+  .oav-hero-section {
+    padding-top: calc(var(--oav-header-height) + 32px);
+    padding-bottom: 72px;
+  }
+
+  .oav-section--deep>.oav-shell {
+    padding-top: 24px;
+  }
+
+  .oav-header-actions {
+    gap: 10px;
+    margin-left: auto;
+    position: relative;
+  }
+
+  .oav-header-actions>.oav-header-quote {
+    display: none;
+  }
+
+  .oav-menu-toggle {
+    display: inline-flex;
+    color: #393335;
+  }
+
+  .oav-menu-toggle-bar {
+    background: #393335;
+  }
+
+  .oav-nav-backdrop.is-open {
+    visibility: visible;
+    pointer-events: auto;
+    opacity: 1;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    background: transparent;
+  }
+
+  .oav-nav {
+    display: none;
+  }
+
+  .oav-nav-drawer {
+    position: fixed;
+    top: 74px;
+    left: 50%;
+    transform: translate(-50%, -12px);
+    isolation: isolate;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    width: min(340px, 100vw - 1.5rem);
+    max-height: calc(100dvh - 120px);
+    padding: 18px 18px 20px;
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.30);
+    border-radius: 20px;
+    z-index: 60;
+    opacity: 1;
+    visibility: hidden;
+    pointer-events: none;
+    overflow: hidden auto;
+    transition: transform 0.28s, visibility 0.28s;
+    box-shadow: 0 18px 46px rgba(7, 17, 31, 0.22), inset 0 1px rgba(255, 255, 255, 0.46), inset 0 -1px rgba(255, 255, 255, 0.08);
+  }
+
+  .oav-nav-drawer::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: inherit;
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.34) 0%, rgba(255, 255, 255, 0.14) 52%, rgba(255, 255, 255, 0.08) 100%),
+      linear-gradient(135deg, rgba(255, 255, 255, 0.22) 0%, rgba(255, 255, 255, 0.08) 34%, rgba(115, 193, 255, 0.16) 100%);
+    backdrop-filter: blur(84px) saturate(210%);
+    -webkit-backdrop-filter: blur(84px) saturate(210%);
+  }
+
+  .oav-nav-drawer.is-open {
+    visibility: visible;
+    pointer-events: auto;
+    transform: translate(-50%, 0);
+  }
+
+  .oav-nav-drawer a {
+    width: 100%;
+    padding: 13px 16px;
+    text-align: center;
+    font-size: 16px;
+    color: #393335;
+    background: rgba(255, 255, 255, 0.18);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 12px;
+  }
+
+  .oav-nav-drawer a::after {
+    display: none;
+  }
+
+  .oav-nav-drawer a.is-active {
+    color: var(--blue);
+    background: rgba(255, 255, 255, 0.48);
+    border-color: rgba(26, 127, 212, 0.24);
+    box-shadow: 0 12px 24px rgba(7, 17, 31, 0.08);
+  }
+
+  .oav-nav-drawer .oav-nav-quote {
+    display: inline-flex !important;
+    justify-content: center;
+    width: 100%;
+    min-height: 48px;
+    margin-top: 8px;
+    font-size: 18px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    color: #fff;
+    background: var(--blue);
+    border-color: var(--blue);
+    box-shadow: 0 18px 32px rgba(26, 127, 212, 0.26);
+  }
+
+  .oav-nav-drawer .oav-nav-quote:hover,
+  .oav-nav-drawer .oav-nav-quote:focus-visible {
+    color: #fff;
+    background: #1565c0;
+    border-color: #1565c0;
+  }
+
+  .oav-hero-layout {
+    padding-bottom: 52px;
+  }
+
+  .oav-hero-slide {
+    min-height: auto;
+  }
+
+  .oav-hero-kicker {
+    font-size: 22px;
+    line-height: 1.06;
+    letter-spacing: 0.08em;
+    white-space: normal;
+  }
+
+  .oav-hero-kicker--compact {
+    font-size: 22px;
+    white-space: normal;
+  }
+
+  .oav-hero-kicker-mobile-line {
+    display: block;
+  }
+
+  .oav-hero-kicker-mobile-line + .oav-hero-kicker-mobile-line::before {
+    content: none;
+  }
+
+  .oav-hero-slide h1,
+  .oav-hero-description {
+    min-height: 0;
+  }
+
+  .oav-hero-slide h1 {
+    font-size: clamp(44px, 16vw, 72px);
+  }
+
+  .oav-hero-description {
+    max-width: 100%;
+    font-size: 17px;
+  }
+
+  #about.oav-section--deep {
+    border-top: 1px solid #f5f5f3;
+  }
+
+  .oav-section-intro>span:first-child {
+    letter-spacing: 0.20em;
+    gap: 12px;
+    margin-bottom: 16px;
+    font-size: 14px;
+  }
+
+  .oav-section-intro>span:first-child::before {
+    flex-basis: 12px;
+    width: 12px;
+    height: 42px;
+  }
+
+  #portfolio .oav-section-intro>span:first-child {
+    padding-block: 8px;
+  }
+
+  .oav-hero-lineup-band {
+    flex-basis: 100%;
+  }
+
+  .oav-hero-lineup-item {
+    padding: 12px 18px;
+  }
+
+  .oav-metric-strip,
+  .oav-principle-grid,
+  .oav-contact-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .oav-review-card {
+    flex-basis: min(82vw, 320px);
+  }
+
+  .oav-metric-strip--about {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .oav-metric-strip--about .oav-metric-item span {
+    white-space: pre-line;
+    line-height: 1.45;
+  }
+
+  .oav-section {
+    padding-block: 72px;
+  }
+
+  .oav-about-grid {
+    background: transparent;
+    border-radius: 0;
+    gap: 0;
+    overflow: visible;
+  }
+
+  .oav-about-story {
+    padding: 40px 28px;
+  }
+
+  .oav-about-visual {
+    width: 100vw;
+    min-height: 510px;
+    margin-left: calc(50% - 50vw);
+  }
+
+  .oav-visual-stack {
+    padding: 32px 28px;
+  }
+
+  .oav-principle-slider.is-mobile {
+    display: grid;
+    gap: 0;
+    width: 100vw;
+    margin-left: calc(50% - 50vw);
+  }
+
+  .oav-principle-viewport {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .oav-principle-grid.is-carousel {
+    display: flex;
+    gap: 0;
+    margin-top: 0;
+    background: transparent;
+    will-change: transform;
+    touch-action: pan-y;
+    transition: transform 0.5s;
+  }
+
+  .oav-principle-grid.is-carousel .oav-principle-card {
+    flex: 0 0 100%;
+    min-width: 100%;
+    padding-bottom: 78px;
+  }
+
+  .oav-principle-dots {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    position: absolute;
+    bottom: 18px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 2;
+  }
+
+  .oav-principle-dot {
+    width: 9px;
+    height: 9px;
+    padding: 0;
+    border: none;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.28);
+    transition: background 0.28s, transform 0.28s, opacity 0.28s;
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.12);
+  }
+
+  .oav-principle-dot.is-active {
+    background: rgba(255, 255, 255, 0.98);
+    transform: scale(1.08);
+  }
+
+  .oav-services-grid--desktop {
+    display: none;
+  }
+
+  .oav-services-stage--mobile {
+    display: block;
+  }
+
+  .oav-reviews-marquee.is-mobile {
+    overflow: auto hidden;
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-x;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    padding-bottom: 8px;
+  }
+
+  .oav-reviews-marquee.is-mobile::-webkit-scrollbar {
+    display: none;
+  }
+
+  .oav-reviews-marquee.is-mobile:hover .oav-reviews-track {
+    animation-play-state: running;
+  }
+
+  .oav-reviews-track.is-mobile {
+    width: max-content;
+    gap: 18px;
+    padding-inline: 0 1rem;
+    animation: none;
+  }
+
+  .oav-reviews-track.is-mobile .oav-review-card {
+    flex: 0 0 min(82vw, 320px);
+  }
+
+  .oav-reviews-track.is-mobile .oav-review-card:hover,
+  .oav-reviews-track.is-mobile .oav-review-card:focus-within {
+    background: #fff;
+    border-color: rgba(26, 127, 212, 0.22);
+    transform: none;
+  }
+
+  .oav-portfolio-stage::before,
+  .oav-portfolio-stage::after {
+    width: 22px;
+  }
+
+  .oav-portfolio-rail {
+    gap: 18px;
+    padding-inline: 1rem;
+    scroll-padding-inline: 1rem;
+  }
+
+  .oav-portfolio-card {
+    flex-basis: min(82vw, 292px);
+  }
+
+  .oav-portfolio-media {
+    aspect-ratio: 1.48;
+  }
+
+  .oav-portfolio-body {
+    padding: 18px 20px 28px;
+  }
+
+  .oav-portfolio-card-hit {
+    aspect-ratio: 1.48;
+    height: auto;
+    bottom: auto;
+    left: 0;
+    right: 0;
+  }
+
+  .oav-portfolio-card:hover,
+  .oav-portfolio-card:focus-within {
+    background: #efefed;
+    transform: none;
+    box-shadow: 0 10px 24px rgba(7, 22, 40, 0.12) !important;
+  }
+
+  .oav-portfolio-card:hover .oav-portfolio-media img,
+  .oav-portfolio-card:focus-within .oav-portfolio-media img {
+    transform: none;
+  }
+
+  .oav-portfolio-card-overlay {
+    opacity: 1;
+    background: linear-gradient(rgba(4, 11, 22, 0.06) 0%, rgba(4, 11, 22, 0.16) 32%, rgba(4, 11, 22, 0.62) 100%);
+    padding: 18px 18px 14px;
+  }
+
+  .oav-portfolio-card-cta {
+    color: #7bd2ff;
+    letter-spacing: 2.2px;
+    gap: 10px;
+    font-size: 9px;
+    transform: translateY(0);
+  }
+
+  .oav-portfolio-arrow {
+    width: 44px;
+    height: 44px;
+    top: 34%;
+  }
+
+  .oav-portfolio-arrow--left,
+  .oav-portfolio-arrow--right {
+    transform: translateY(-50%);
+  }
+
+  .oav-service-row {
+    grid-template-columns: 1fr;
+    padding: 32px 0;
+  }
+
+  .oav-service-no {
+    display: none;
+  }
+
+  .oav-contact-form {
+    grid-template-columns: 1fr;
+  }
+
+  .oav-footer-panel {
+    gap: 34px;
+    padding-top: calc(var(--oav-header-height) + 72px);
+    padding-bottom: 72px;
+  }
+
+  .oav-footer-top {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .oav-footer-brand {
+    min-height: 62px;
+    padding: 10px 16px;
+  }
+
+  .oav-footer-cta {
+    width: 100%;
+    min-width: 0;
+    max-width: 228px;
+  }
+
+  .oav-footer-cta--top {
+    display: none;
+  }
+
+  .oav-footer-cta--mobile {
+    display: inline-flex;
+    margin-top: 18px;
+  }
+
+  .oav-footer-main {
+    gap: 30px;
+  }
+
+  .oav-footer-kicker {
+    margin-bottom: 12px;
+    font-size: clamp(40px, 12vw, 54px);
+    line-height: 0.95;
+    letter-spacing: 2px;
+  }
+
+  .oav-footer-description {
+    max-width: 100%;
+    font-size: 17px;
+    line-height: 1.12;
+  }
+
+  .oav-footer-columns {
+    grid-template-columns: 1fr;
+    gap: 18px;
+  }
+
+  .oav-footer-column h3 {
+    margin-bottom: 10px;
+    font-size: 15px;
+  }
+
+  .oav-footer-list {
+    gap: 8px;
+  }
+
+  .oav-footer-list a,
+  .oav-footer-list span {
+    font-size: 14px;
+  }
+
+  .oav-footer-bottom {
+    flex-direction: column;
+    align-items: flex-start;
+    padding-top: 24px;
+    margin-bottom: 28px;
+  }
+
+  .oav-footer-backtotop {
+    gap: 8px;
+    letter-spacing: 0.14em;
+  }
+
+  .oav-footer-monogram {
+    bottom: calc(-0.28em - 30px);
+    width: min(92vw, 520px);
+    transform: translateX(-50%) scaleX(1.06);
+    font-size: clamp(11rem, 32vw, 14rem);
+  }
+
+  .oav-portfolio-lightbox-close {
+    width: 42px;
+    height: 42px;
+    top: 12px;
+    right: 12px;
+  }
+
+  .oav-portfolio-lightbox-caption {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 14px 16px;
+  }
+}
