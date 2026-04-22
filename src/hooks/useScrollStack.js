@@ -46,16 +46,12 @@ export default function useScrollStack(sectionIds) {
         return
       }
 
-      const isMobileStack = window.matchMedia('(max-width: 760px)').matches
-
       sections.forEach((section, index) => {
         section.style.position = 'fixed'
         section.style.top = '0'
         section.style.left = '0'
         section.style.width = '100%'
-        section.style.zIndex = String(
-          isMobileStack && index === sections.length - 1 ? Math.max(index, 2) : index + 2,
-        )
+        section.style.zIndex = String(index + 2)
         section.style.willChange = 'transform'
       })
 
