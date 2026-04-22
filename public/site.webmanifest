@@ -1,0 +1,22 @@
+{
+  "name": "Ola Aluminum Venture",
+  "short_name": "OAV",
+  "description": "Where Glass Meets Craft. Aluminium, glass, and stainless steel installation across Nigeria.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#08111c",
+  "theme_color": "#1a7fd4",
+  "icons": [
+    {
+      "src": "/oav-icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/oav-favicon.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
