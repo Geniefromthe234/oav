@@ -1,12 +1,3 @@
-import { motion } from 'framer-motion'
-
-const reveal = {
-  initial: { opacity: 0, y: 30 },
-  whileInView: { opacity: 1, y: 0 },
-  viewport: { once: true, amount: 0.2 },
-  transition: { duration: 0.55, ease: [0.22, 1, 0.36, 1] },
-}
-
 function ArrowIcon() {
   return (
     <svg aria-hidden="true" viewBox="0 0 24 24">
@@ -18,7 +9,7 @@ function ArrowIcon() {
 
 export default function PortfolioCard({ onOpen, project, index }) {
   return (
-    <motion.article className="oav-portfolio-card" {...reveal}>
+    <article className="oav-portfolio-card">
       <div className="oav-portfolio-media">
         <img
           alt={project.alt ?? project.title}
@@ -49,6 +40,6 @@ export default function PortfolioCard({ onOpen, project, index }) {
           </span>
         </span>
       </button>
-    </motion.article>
+    </article>
   )
 }

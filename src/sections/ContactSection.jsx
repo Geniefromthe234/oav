@@ -1,17 +1,8 @@
-import { motion } from 'framer-motion'
-
-const reveal = {
-  initial: { opacity: 0, y: 24 },
-  whileInView: { opacity: 1, y: 0 },
-  viewport: { once: true, amount: 0.2 },
-  transition: { duration: 0.55, ease: [0.22, 1, 0.36, 1] },
-}
-
 export default function ContactSection({ contact, services }) {
   return (
     <section id="contact" className="oav-section oav-section--contact">
       <div className="oav-shell">
-        <motion.div className="oav-contact-band" {...reveal}>
+        <div className="oav-contact-band">
           <div className="oav-contact-copy">
             <div className="oav-section-intro" style={{ marginBottom: 0 }}>
               <span>Get in touch</span>
@@ -95,7 +86,7 @@ export default function ContactSection({ contact, services }) {
               </button>
             </div>
           </form>
-        </motion.div>
+        </div>
       </div>
     </section>
   )

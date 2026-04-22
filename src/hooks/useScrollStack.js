@@ -26,6 +26,47 @@ export default function useScrollStack(sectionIds) {
     const siteEl = sections[0].closest('.oav-site')
     const origStyles = sections.map((section) => section.getAttribute('style') || '')
     let metrics = null
+    let updateFrameId = 0
+    let measureFrameId = 0
+    let preserveScrollOnMeasure = false
+    let viewportSnapshot = null
+
+    function getViewportSnapshot() {
+      const visualViewport = window.visualViewport
+
+      return {
+        height: visualViewport?.height ?? window.innerHeight,
+        width: visualViewport?.width ?? window.innerWidth,
+      }
+    }
+
+    function shouldPreserveScrollPosition() {
+      return !metrics?.isStickyMode
+    }
+
+    function hasMeaningfulViewportChange() {
+      const nextSnapshot = getViewportSnapshot()
+
+      if (!viewportSnapshot) {
+        viewportSnapshot = nextSnapshot
+        return true
+      }
+
+      if (!metrics?.isStickyMode) {
+        viewportSnapshot = nextSnapshot
+        return true
+      }
+
+      const widthDelta = Math.abs(nextSnapshot.width - viewportSnapshot.width)
+      const heightDelta = Math.abs(nextSnapshot.height - viewportSnapshot.height)
+      const hasMeaningfulChange = widthDelta > 2 || heightDelta > 120
+
+      if (hasMeaningfulChange) {
+        viewportSnapshot = nextSnapshot
+      }
+
+      return hasMeaningfulChange
+    }
 
     function measure() {
       sections.forEach((section, index) => {
@@ -41,6 +82,7 @@ export default function useScrollStack(sectionIds) {
       }
 
       metrics = measureScrollStack(sectionIds)
+      viewportSnapshot = getViewportSnapshot()
 
       if (!metrics) {
         return
@@ -56,39 +98,42 @@ export default function useScrollStack(sectionIds) {
       })
 
       if (siteEl) {
-        siteEl.style.minHeight = `${metrics.totalScrollHeight + metrics.viewportHeight}px`
+        siteEl.style.minHeight = metrics.isStickyMode
+          ? `${metrics.totalScrollHeight}px`
+          : `${metrics.totalScrollHeight + metrics.viewportHeight}px`
       }
     }
 
-    let pending = false
-
     function scheduleUpdate() {
-      if (pending || !metrics) {
+      if (updateFrameId || !metrics) {
         return
       }
 
-      pending = true
-
-      requestAnimationFrame(() => {
-        pending = false
+      updateFrameId = requestAnimationFrame(() => {
+        updateFrameId = 0
 
         const scrollY = window.scrollY
 
         sections.forEach((section, index) => {
-          section.style.transform = `translateY(${getSectionTranslateY(metrics, index, scrollY)}px)`
+          const translateY = Math.round(getSectionTranslateY(metrics, index, scrollY))
+
+          section.style.transform = `translate3d(0, ${translateY}px, 0)`
         })
       })
     }
 
-    function onResize() {
-      const currentSectionId = findActiveStackSectionFromMetrics(metrics, sectionIds[0] ?? 'home')
-      const currentSectionProgress = getSectionScrollProgress(metrics, currentSectionId)
+    function remeasure({ preserveScroll = false } = {}) {
+      const shouldPreserveScroll = preserveScroll && shouldPreserveScrollPosition()
+      const currentSectionId = shouldPreserveScroll && metrics
+        ? findActiveStackSectionFromMetrics(metrics, sectionIds[0] ?? 'home')
+        : null
+      const currentSectionProgress = currentSectionId
+        ? getSectionScrollProgress(metrics, currentSectionId)
+        : 0
 
       measure()
 
-      const resizedSectionId = findActiveStackSectionFromMetrics(metrics, sectionIds[0] ?? 'home')
-
-      if (currentSectionId !== resizedSectionId) {
+      if (currentSectionId) {
         const preservedScrollY = getScrollYForSectionProgress(
           metrics,
           currentSectionId,
@@ -106,16 +151,49 @@ export default function useScrollStack(sectionIds) {
       scheduleUpdate()
     }
 
+    function scheduleMeasure({ preserveScroll = false } = {}) {
+      preserveScrollOnMeasure = preserveScrollOnMeasure || preserveScroll
+
+      if (measureFrameId) {
+        return
+      }
+
+      measureFrameId = requestAnimationFrame(() => {
+        measureFrameId = 0
+
+        const nextPreserveScroll = preserveScrollOnMeasure
+
+        preserveScrollOnMeasure = false
+        remeasure({ preserveScroll: nextPreserveScroll })
+      })
+    }
+
+    function onResize() {
+      if (!hasMeaningfulViewportChange()) {
+        return
+      }
+
+      scheduleMeasure({ preserveScroll: shouldPreserveScrollPosition() })
+    }
+
     measure()
     scheduleUpdate()
     window.addEventListener('scroll', scheduleUpdate, { passive: true })
     window.addEventListener('resize', onResize, { passive: true })
 
     const visualViewport = window.visualViewport
+    const resizeObserver =
+      typeof ResizeObserver !== 'undefined'
+        ? new ResizeObserver(() => {
+          scheduleMeasure({ preserveScroll: shouldPreserveScrollPosition() })
+        })
+        : null
 
     if (visualViewport) {
       visualViewport.addEventListener('resize', onResize, { passive: true })
     }
+
+    sections.forEach((section) => resizeObserver?.observe(section))
 
     return () => {
       window.removeEventListener('scroll', scheduleUpdate)
@@ -124,6 +202,16 @@ export default function useScrollStack(sectionIds) {
       if (visualViewport) {
         visualViewport.removeEventListener('resize', onResize)
       }
+
+      if (updateFrameId) {
+        cancelAnimationFrame(updateFrameId)
+      }
+
+      if (measureFrameId) {
+        cancelAnimationFrame(measureFrameId)
+      }
+
+      resizeObserver?.disconnect()
 
       sections.forEach((section, index) => {
         if (origStyles[index]) {

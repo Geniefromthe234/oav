@@ -1,4 +1,13 @@
 export const TRANSITION_PX = 600
+const MOBILE_BREAKPOINT = 760
+
+function isMobileViewport() {
+  return typeof window !== 'undefined' && window.innerWidth <= MOBILE_BREAKPOINT
+}
+
+function getHeaderHeight() {
+  return document.querySelector('.oav-header')?.offsetHeight ?? 0
+}
 
 function getViewportHeight() {
   if (typeof window === 'undefined') {
@@ -20,6 +29,37 @@ export function getStackSections(sectionIds) {
     .filter(Boolean)
 }
 
+function getMobileStackTriggerY(viewportHeight) {
+  const headerHeight = getHeaderHeight()
+
+  return headerHeight + Math.max((viewportHeight - headerHeight) * 0.5, 0)
+}
+
+function getNaturalZoneStarts(sections) {
+  const originalStyles = sections.map((section) => section.getAttribute('style'))
+
+  sections.forEach((section) => {
+    section.removeAttribute('style')
+  })
+
+  const zoneStarts = sections.map((section) => (
+    Math.round(section.getBoundingClientRect().top + window.scrollY)
+  ))
+
+  sections.forEach((section, index) => {
+    const originalStyle = originalStyles[index]
+
+    if (originalStyle === null) {
+      section.removeAttribute('style')
+      return
+    }
+
+    section.setAttribute('style', originalStyle)
+  })
+
+  return zoneStarts
+}
+
 export function measureScrollStack(sectionIds) {
   if (typeof window === 'undefined') {
     return null
@@ -33,6 +73,32 @@ export function measureScrollStack(sectionIds) {
 
   const viewportHeight = getViewportHeight()
   const heights = sections.map((section) => section.offsetHeight)
+
+  if (isMobileViewport()) {
+    const zoneStarts = getNaturalZoneStarts(sections)
+
+    const lastIndex = sections.length - 1
+    const zoneLengths = sections.map((_, i) => {
+      if (i < lastIndex) {
+        return zoneStarts[i + 1] - zoneStarts[i]
+      }
+
+      return heights[i]
+    })
+
+    return {
+      contentScrollHeights: heights.map((height) => Math.max(height - viewportHeight, 0)),
+      heights,
+      isStickyMode: true,
+      sections,
+      stackTriggerY: getMobileStackTriggerY(viewportHeight),
+      totalScrollHeight: zoneStarts[lastIndex] + heights[lastIndex],
+      viewportHeight,
+      zoneLengths,
+      zoneStarts,
+    }
+  }
+
   const contentScrollHeights = heights.map((height) => Math.max(height - viewportHeight, 0))
   const zoneLengths = heights.map((_, index) => (
     contentScrollHeights[index] + (index < heights.length - 1 ? TRANSITION_PX : 0)
@@ -57,6 +123,24 @@ export function measureScrollStack(sectionIds) {
 }
 
 export function getSectionTranslateY(metrics, index, scrollY) {
+  if (metrics.isStickyMode) {
+    const naturalTop = metrics.zoneStarts[index] - scrollY
+    const nextZoneStart = metrics.zoneStarts[index + 1]
+
+    if (typeof nextZoneStart !== 'number') {
+      return naturalTop
+    }
+
+    const stackTriggerY = metrics.stackTriggerY ?? getMobileStackTriggerY(metrics.viewportHeight)
+    const freezeStart = nextZoneStart - stackTriggerY
+
+    if (scrollY >= freezeStart) {
+      return stackTriggerY - metrics.heights[index]
+    }
+
+    return naturalTop
+  }
+
   const zoneStart = metrics.zoneStarts[index]
   const contentScrollHeight = metrics.contentScrollHeights[index]
   const height = metrics.heights[index]
@@ -85,21 +169,8 @@ export function getSectionTranslateY(metrics, index, scrollY) {
   return -height
 }
 
-export function getSectionScrollTop(sectionIds, sectionId) {
-  const metrics = measureScrollStack(sectionIds)
-
-  if (!metrics) {
-    return null
-  }
-
-  const index = metrics.sections.findIndex((section) => section.id === sectionId)
-
-  return index >= 0 ? metrics.zoneStarts[index] : null
-}
-
 export function getTrackingLineY() {
-  const header = document.querySelector('.oav-header')
-  const headerHeight = header?.offsetHeight ?? 0
+  const headerHeight = getHeaderHeight()
   const viewportOffset = Math.min(Math.max(getViewportHeight() * 0.32, 120), 240)
 
   return headerHeight + viewportOffset
@@ -108,6 +179,21 @@ export function getTrackingLineY() {
 export function findActiveStackSectionFromMetrics(metrics, fallbackSectionId = 'home', scrollY = window.scrollY) {
   if (!metrics?.sections.length) {
     return fallbackSectionId
+  }
+
+  if (metrics.isStickyMode) {
+    const trackingLineY = getTrackingLineY()
+    let active = metrics.sections[0].id
+
+    for (let i = 0; i < metrics.sections.length; i++) {
+      const rect = metrics.sections[i].getBoundingClientRect()
+
+      if (rect.top <= trackingLineY && rect.bottom > 0) {
+        active = metrics.sections[i].id
+      }
+    }
+
+    return active
   }
 
   if (scrollY >= metrics.totalScrollHeight - 4) {
@@ -132,12 +218,6 @@ export function findActiveStackSectionFromMetrics(metrics, fallbackSectionId = '
   })
 
   return activeId ?? fallbackId
-}
-
-export function findActiveStackSection(sectionIds) {
-  const metrics = measureScrollStack(sectionIds)
-
-  return findActiveStackSectionFromMetrics(metrics, sectionIds[0] ?? 'home')
 }
 
 export function getSectionScrollProgress(metrics, sectionId, scrollY = window.scrollY) {
@@ -177,24 +257,4 @@ export function getScrollYForSectionProgress(metrics, sectionId, progress = 0) {
   const clampedProgress = Math.min(Math.max(progress, 0), 1)
 
   return metrics.zoneStarts[index] + Math.round(metrics.zoneLengths[index] * clampedProgress)
-}
-
-export function hasReachedStackSection(sectionIds, sectionId) {
-  const metrics = measureScrollStack(sectionIds)
-
-  if (!metrics) {
-    return false
-  }
-
-  const index = metrics.sections.findIndex((section) => section.id === sectionId)
-
-  if (index < 0) {
-    return false
-  }
-
-  const top = getSectionTranslateY(metrics, index, window.scrollY)
-  const bottom = top + metrics.heights[index]
-  const trackingLineY = getTrackingLineY()
-
-  return trackingLineY >= top && trackingLineY < bottom
 }

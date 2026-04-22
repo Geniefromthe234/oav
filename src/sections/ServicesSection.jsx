@@ -33,20 +33,45 @@ export default function ServicesSection({ services }) {
 
     const updateScrollState = () => {
       const maxScrollLeft = rail.scrollWidth - rail.clientWidth
+      const canScrollLeft = rail.scrollLeft > EDGE_TOLERANCE
+      const canScrollRight = rail.scrollLeft < maxScrollLeft - EDGE_TOLERANCE
 
-      setScrollState({
-        canScrollLeft: rail.scrollLeft > EDGE_TOLERANCE,
-        canScrollRight: rail.scrollLeft < maxScrollLeft - EDGE_TOLERANCE,
+      setScrollState((currentState) => {
+        if (
+          currentState.canScrollLeft === canScrollLeft
+          && currentState.canScrollRight === canScrollRight
+        ) {
+          return currentState
+        }
+
+        return { canScrollLeft, canScrollRight }
+      })
+    }
+
+    let frameId = 0
+
+    const scheduleScrollStateUpdate = () => {
+      if (frameId) {
+        return
+      }
+
+      frameId = window.requestAnimationFrame(() => {
+        frameId = 0
+        updateScrollState()
       })
     }
 
     updateScrollState()
-    rail.addEventListener('scroll', updateScrollState, { passive: true })
-    window.addEventListener('resize', updateScrollState)
+    rail.addEventListener('scroll', scheduleScrollStateUpdate, { passive: true })
+    window.addEventListener('resize', scheduleScrollStateUpdate)
 
     return () => {
-      rail.removeEventListener('scroll', updateScrollState)
-      window.removeEventListener('resize', updateScrollState)
+      if (frameId) {
+        window.cancelAnimationFrame(frameId)
+      }
+
+      rail.removeEventListener('scroll', scheduleScrollStateUpdate)
+      window.removeEventListener('resize', scheduleScrollStateUpdate)
     }
   }, [services.length])
 

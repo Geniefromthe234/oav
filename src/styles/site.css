@@ -4,28 +4,29 @@
   margin-inline: auto;
 }
 
-@media (width >760px) {
+@media (min-width: 761px) {
+
   html,
   body {
-    scrollbar-color: #1a7fd4 #ffffff;
+    scrollbar-color: #1a7fd4 #efefed;
     scrollbar-width: auto;
   }
 
   html::-webkit-scrollbar,
   body::-webkit-scrollbar {
-    width: 14px;
-    background: #ffffff;
+    width: 16px;
+    background: #efefed;
   }
 
   html::-webkit-scrollbar-track,
   body::-webkit-scrollbar-track {
-    background: #ffffff;
+    background: linear-gradient(90deg, #efefed 0 24%, #ffffff 24% 76%, #efefed 76% 100%);
   }
 
   html::-webkit-scrollbar-thumb,
   body::-webkit-scrollbar-thumb {
     background: #1a7fd4;
-    border: 3px solid #ffffff;
+    border: 4px solid #ffffff;
     border-radius: 999px;
   }
 
@@ -492,19 +493,15 @@
 
 .oav-hero-stack-face::before {
   background:
-    linear-gradient(
-      132deg,
+    linear-gradient(132deg,
       rgba(255, 255, 255, 0.42) 0%,
       rgba(255, 255, 255, 0.22) 11%,
       rgba(255, 255, 255, 0.08) 18%,
-      rgba(255, 255, 255, 0) 31%
-    ),
-    linear-gradient(
-      180deg,
+      rgba(255, 255, 255, 0) 31%),
+    linear-gradient(180deg,
       rgba(255, 255, 255, 0.16) 0%,
       rgba(255, 255, 255, 0.06) 10%,
-      rgba(255, 255, 255, 0) 22%
-    );
+      rgba(255, 255, 255, 0) 22%);
   pointer-events: none;
 }
 
@@ -588,7 +585,7 @@
   display: inline;
 }
 
-.oav-hero-kicker-mobile-line + .oav-hero-kicker-mobile-line::before {
+.oav-hero-kicker-mobile-line+.oav-hero-kicker-mobile-line::before {
   content: ' ';
 }
 
@@ -762,6 +759,7 @@
 }
 
 @keyframes oav-stack-badge-bounce {
+
   0%,
   100% {
     transform: translateY(0);
@@ -785,6 +783,7 @@
 }
 
 @media (width <=760px) {
+
   html,
   body {
     overscroll-behavior-y: none;
@@ -792,7 +791,7 @@
 
   .oav-site {
     position: relative;
-    overflow: clip;
+    overflow-x: clip;
   }
 
   .oav-hero-grid {
@@ -2016,7 +2015,15 @@
 
 /* -- REVIEWS ------------------------------------------- */
 .oav-reviews-marquee {
-  overflow: hidden;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  scroll-behavior: smooth;
+}
+
+.oav-reviews-marquee::-webkit-scrollbar {
+  display: none;
 }
 
 .oav-reviews-stage {
@@ -2032,12 +2039,7 @@
   align-items: stretch;
   gap: 24px;
   width: max-content;
-  animation: oav-reviews-marquee 96s linear infinite;
-  will-change: transform;
-}
-
-.oav-reviews-marquee:hover .oav-reviews-track {
-  animation-play-state: paused;
+  will-change: auto;
 }
 
 .oav-review-card {
@@ -2606,7 +2608,7 @@
   margin-right: -0.02em;
 }
 
-.oav-footer-monogram-letter + .oav-footer-monogram-letter {
+.oav-footer-monogram-letter+.oav-footer-monogram-letter {
   margin-left: -0.07em;
 }
 
@@ -2848,7 +2850,7 @@
     display: block;
   }
 
-  .oav-hero-kicker-mobile-line + .oav-hero-kicker-mobile-line::before {
+  .oav-hero-kicker-mobile-line+.oav-hero-kicker-mobile-line::before {
     content: none;
   }
 

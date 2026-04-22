@@ -1,14 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
-import { motion } from 'framer-motion'
 import MetricStrip from '../components/site/MetricStrip'
 import SectionIntro from '../components/site/SectionIntro'
-
-const reveal = {
-  initial: { opacity: 0, y: 24 },
-  whileInView: { opacity: 1, y: 0 },
-  viewport: { once: true, amount: 0.2 },
-  transition: { duration: 0.55, ease: [0.22, 1, 0.36, 1] },
-}
 
 export default function AboutSection({ highlights, principles, stats }) {
   const [activePrinciple, setActivePrinciple] = useState(0)
@@ -87,7 +79,7 @@ export default function AboutSection({ highlights, principles, stats }) {
         />
 
         <div className="oav-about-grid">
-          <motion.article className="oav-about-story" {...reveal}>
+          <article className="oav-about-story">
             <p>
               We work on new builds, private residences, commercial frontages, and upgrade projects
               that demand exact finishing and dependable site management. Every installation is
@@ -97,9 +89,9 @@ export default function AboutSection({ highlights, principles, stats }) {
               {highlights.map((item) => <li key={item}>{item}</li>)}
             </ul>
             <MetricStrip className="oav-metric-strip--about" items={stats} />
-          </motion.article>
+          </article>
 
-          <motion.article className="oav-about-visual" {...reveal}>
+          <article className="oav-about-visual">
             <div className="oav-visual-stack">
               <span className="oav-card-tag">Project delivery</span>
               <h3>Structured for homes, offices, and multi-site work.</h3>
@@ -108,7 +100,7 @@ export default function AboutSection({ highlights, principles, stats }) {
                 the workflow keeps quality consistent regardless of project scale.
               </p>
             </div>
-          </motion.article>
+          </article>
         </div>
 
         <div className={`oav-principle-slider ${isMobilePrinciples ? 'is-mobile' : ''}`}>
@@ -127,11 +119,11 @@ export default function AboutSection({ highlights, principles, stats }) {
               }
             >
               {principles.map((principle, index) => (
-                <motion.article key={principle.title} className="oav-principle-card" {...reveal}>
+                <article key={principle.title} className="oav-principle-card">
                   <span className="oav-card-index">{String(index + 1).padStart(2, '0')}</span>
                   <h3>{principle.title}</h3>
                   <p>{principle.copy}</p>
-                </motion.article>
+                </article>
               ))}
             </div>
 

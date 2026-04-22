@@ -1,13 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { motion } from 'framer-motion'
 import SectionIntro from '../components/site/SectionIntro'
-
-const reveal = {
-  initial: { opacity: 0, y: 24 },
-  whileInView: { opacity: 1, y: 0 },
-  viewport: { once: true, amount: 0.2 },
-  transition: { duration: 0.55, ease: [0.22, 1, 0.36, 1] },
-}
 
 const MOBILE_BREAKPOINT = 760
 const EDGE_TOLERANCE = 16
@@ -38,7 +30,6 @@ export default function ReviewsSection({ reviews }) {
     canScrollRight: reviews.length > 1,
   })
   const marqueeRef = useRef(null)
-  const displayedReviews = isMobileReviews ? reviews : [...reviews, ...reviews]
 
   useEffect(() => {
     const mediaQuery = window.matchMedia(`(max-width: ${MOBILE_BREAKPOINT}px)`)
@@ -120,7 +111,18 @@ export default function ReviewsSection({ reviews }) {
     })
   }
 
-  const ReviewCardTag = isMobileReviews ? 'article' : motion.article
+  const handleMarqueeWheel = (event) => {
+    if (
+      isMobileReviews
+      || Math.abs(event.deltaY) <= Math.abs(event.deltaX)
+      || event.shiftKey
+    ) {
+      return
+    }
+
+    event.preventDefault()
+    marqueeRef.current?.scrollBy({ left: event.deltaY, behavior: 'auto' })
+  }
 
   return (
     <section id="reviews" className="oav-section oav-section--steel">
@@ -150,10 +152,9 @@ export default function ReviewsSection({ reviews }) {
               tabIndex={0}
             >
               <div className="oav-reviews-track is-mobile">
-                {displayedReviews.map((review, index) => (
-                  <ReviewCardTag
+                {reviews.map((review, index) => (
+                  <article
                     key={`${review.project}-${review.location}-${index}`}
-                    aria-hidden={index >= reviews.length}
                     className="oav-review-card"
                   >
                     <div className="oav-review-meta">
@@ -167,7 +168,7 @@ export default function ReviewsSection({ reviews }) {
                       <strong>{review.client}</strong>
                       <span>{review.role}</span>
                     </div>
-                  </ReviewCardTag>
+                  </article>
                 ))}
               </div>
             </div>
@@ -183,14 +184,17 @@ export default function ReviewsSection({ reviews }) {
             </button>
           </div>
         ) : (
-          <div className="oav-reviews-marquee" ref={marqueeRef}>
+          <div
+            className="oav-reviews-marquee"
+            onWheel={handleMarqueeWheel}
+            ref={marqueeRef}
+            tabIndex={0}
+          >
             <div className="oav-reviews-track">
-              {displayedReviews.map((review, index) => (
-                <ReviewCardTag
+              {reviews.map((review, index) => (
+                <article
                   key={`${review.project}-${review.location}-${index}`}
-                  aria-hidden={index >= reviews.length}
                   className="oav-review-card"
-                  {...reveal}
                 >
                   <div className="oav-review-meta">
                     <span className="oav-card-tag">{review.project}</span>
@@ -203,7 +207,7 @@ export default function ReviewsSection({ reviews }) {
                     <strong>{review.client}</strong>
                     <span>{review.role}</span>
                   </div>
-                </ReviewCardTag>
+                </article>
               ))}
             </div>
           </div>
