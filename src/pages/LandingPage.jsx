@@ -33,9 +33,11 @@ function getIsMobileViewport() {
 }
 
 export default function LandingPage() {
-  useScrollStack([...sectionIds, 'footer'])
-  const { activeSection, setActiveSection } = useActiveSection(sectionIds)
   const [isMobileViewport, setIsMobileViewport] = useState(getIsMobileViewport)
+  const stackedSectionIds = isMobileViewport ? sectionIds : [...sectionIds, 'footer']
+
+  useScrollStack(stackedSectionIds)
+  const { activeSection, setActiveSection } = useActiveSection(sectionIds)
 
   useEffect(() => {
     const mediaQuery = window.matchMedia(`(max-width: ${MOBILE_BREAKPOINT}px)`)

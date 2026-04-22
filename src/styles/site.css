@@ -4,6 +4,52 @@
   margin-inline: auto;
 }
 
+.oav-whatsapp-float {
+  position: fixed;
+  right: max(18px, env(safe-area-inset-right));
+  bottom: max(18px, env(safe-area-inset-bottom));
+  z-index: 80;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 54px;
+  height: 54px;
+  padding: 0;
+  border-radius: 999px;
+  background: #25d366;
+  color: #ffffff;
+  box-shadow: 0 16px 32px rgba(10, 38, 67, 0.22);
+  line-height: 0;
+  isolation: isolate;
+  transform: translateZ(0);
+  transition: transform 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+}
+
+.oav-whatsapp-float:hover {
+  background: #1ebe5d;
+  color: #ffffff;
+  transform: translateY(-1px) translateZ(0);
+  box-shadow: 0 18px 34px rgba(10, 38, 67, 0.24);
+}
+
+.oav-whatsapp-float:focus-visible {
+  outline: 2px solid rgba(37, 211, 102, 0.32);
+  outline-offset: 4px;
+}
+
+.oav-whatsapp-float-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+}
+
+.oav-whatsapp-float-icon svg {
+  width: 100%;
+  height: 100%;
+}
+
 @media (min-width: 761px) {
 
   html,
@@ -2705,6 +2751,18 @@
 @media (width <=760px) {
   :root {
     --oav-header-height: 45px;
+  }
+
+  .oav-whatsapp-float {
+    right: max(14px, env(safe-area-inset-right));
+    bottom: max(14px, env(safe-area-inset-bottom));
+    width: 50px;
+    height: 50px;
+  }
+
+  .oav-whatsapp-float-icon {
+    width: 24px;
+    height: 24px;
   }
 
   .oav-shell {
