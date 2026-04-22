@@ -2932,9 +2932,13 @@
   }
 
   .oav-reviews-marquee.is-mobile {
-    overflow: auto hidden;
+    overflow-x: auto;
+    overflow-y: visible;
     -webkit-overflow-scrolling: touch;
-    touch-action: pan-x;
+    touch-action: auto;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
     scrollbar-width: none;
     -ms-overflow-style: none;
     padding-bottom: 8px;
@@ -2944,19 +2948,19 @@
     display: none;
   }
 
-  .oav-reviews-marquee.is-mobile:hover .oav-reviews-track {
-    animation-play-state: running;
-  }
-
   .oav-reviews-track.is-mobile {
     width: max-content;
     gap: 18px;
     padding-inline: 0 1rem;
     animation: none;
+    will-change: auto;
   }
 
   .oav-reviews-track.is-mobile .oav-review-card {
     flex: 0 0 min(82vw, 320px);
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
+    transition: none;
   }
 
   .oav-reviews-track.is-mobile .oav-review-card:hover,

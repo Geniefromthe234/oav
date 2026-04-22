@@ -9,18 +9,26 @@ const reveal = {
   transition: { duration: 0.55, ease: [0.22, 1, 0.36, 1] },
 }
 
+const MOBILE_BREAKPOINT = 760
+const AUTO_SCROLL_DELAY_MS = 3200
+const AUTO_SCROLL_RESUME_MS = 900
+
 export default function ReviewsSection({ reviews }) {
-  const [isMobileReviews, setIsMobileReviews] = useState(false)
+  const [isMobileReviews, setIsMobileReviews] = useState(() => {
+    if (typeof window === 'undefined') {
+      return false
+    }
+
+    return window.matchMedia(`(max-width: ${MOBILE_BREAKPOINT}px)`).matches
+  })
   const marqueeRef = useRef(null)
-  const swipeStartXRef = useRef(0)
-  const swipeStartYRef = useRef(0)
-  const isSwipingRef = useRef(false)
+  const autoAdvanceTimeoutRef = useRef(0)
   const resumeTimeoutRef = useRef(0)
-  const loopWidthRef = useRef(0)
-  const displayedReviews = [...reviews, ...reviews]
+  const isPausedRef = useRef(false)
+  const displayedReviews = isMobileReviews ? reviews : [...reviews, ...reviews]
 
   useEffect(() => {
-    const mediaQuery = window.matchMedia('(max-width: 760px)')
+    const mediaQuery = window.matchMedia(`(max-width: ${MOBILE_BREAKPOINT}px)`)
     const syncViewport = () => setIsMobileReviews(mediaQuery.matches)
 
     syncViewport()
@@ -40,92 +48,109 @@ export default function ReviewsSection({ reviews }) {
       return undefined
     }
 
-    let frameId = 0
-    let lastTimestamp = 0
-    const speed = 34
-
-    const updateLoopWidth = () => {
-      loopWidthRef.current = marquee.scrollWidth / 2
+    const stopAutoScroll = () => {
+      window.clearTimeout(autoAdvanceTimeoutRef.current)
     }
 
-    const normalizeScrollPosition = () => {
-      const loopWidth = loopWidthRef.current
+    const stopResumeTimer = () => {
+      window.clearTimeout(resumeTimeoutRef.current)
+    }
 
-      if (!loopWidth) {
+    const getActiveCardIndex = (cards) => {
+      if (!cards.length) {
+        return 0
+      }
+
+      const anchorX = marquee.scrollLeft + marquee.clientWidth / 2
+      let nearestIndex = 0
+      let nearestDistance = Number.POSITIVE_INFINITY
+
+      cards.forEach((card, index) => {
+        const cardCenter = card.offsetLeft + card.offsetWidth / 2
+        const distance = Math.abs(cardCenter - anchorX)
+
+        if (distance < nearestDistance) {
+          nearestDistance = distance
+          nearestIndex = index
+        }
+      })
+
+      return nearestIndex
+    }
+
+    const scheduleAutoScroll = (cards) => {
+      stopAutoScroll()
+
+      if (
+        !cards.length
+        || window.matchMedia('(prefers-reduced-motion: reduce)').matches
+      ) {
         return
       }
 
-      if (marquee.scrollLeft >= loopWidth) {
-        marquee.scrollLeft -= loopWidth
-      }
+      autoAdvanceTimeoutRef.current = window.setTimeout(() => {
+        if (!marquee.isConnected || isPausedRef.current || !cards.length) {
+          return
+        }
 
-      if (marquee.scrollLeft <= 0) {
-        marquee.scrollLeft += loopWidth
-      }
+        const nextIndex = (getActiveCardIndex(cards) + 1) % cards.length
+        cards[nextIndex]?.scrollIntoView({
+          behavior: 'smooth',
+          block: 'nearest',
+          inline: 'start',
+        })
+
+        scheduleAutoScroll(cards)
+      }, AUTO_SCROLL_DELAY_MS)
     }
 
-    updateLoopWidth()
-    marquee.scrollLeft = 1
-
-    const animate = (timestamp) => {
-      if (!lastTimestamp) {
-        lastTimestamp = timestamp
-      }
-
-      const delta = timestamp - lastTimestamp
-      lastTimestamp = timestamp
-
-      if (!isSwipingRef.current) {
-        marquee.scrollLeft += (speed * delta) / 1000
-        normalizeScrollPosition()
-      }
-
-      frameId = window.requestAnimationFrame(animate)
+    const pauseAutoScroll = () => {
+      isPausedRef.current = true
+      stopAutoScroll()
+      stopResumeTimer()
     }
 
-    window.addEventListener('resize', updateLoopWidth)
-    frameId = window.requestAnimationFrame(animate)
+    const resumeAutoScroll = (cards) => {
+      stopResumeTimer()
+      resumeTimeoutRef.current = window.setTimeout(() => {
+        if (!marquee.isConnected) {
+          return
+        }
+
+        isPausedRef.current = false
+        scheduleAutoScroll(cards)
+      }, AUTO_SCROLL_RESUME_MS)
+    }
+
+    const handleTouchStart = () => {
+      pauseAutoScroll()
+    }
+
+    const handleTouchEnd = () => {
+      resumeAutoScroll(cards)
+    }
+
+    const cards = Array.from(
+      marquee.querySelectorAll('.oav-reviews-track .oav-review-card'),
+    )
+
+    isPausedRef.current = false
+    marquee.scrollTo({ left: 0, behavior: 'auto' })
+    marquee.addEventListener('touchstart', handleTouchStart, { passive: true })
+    marquee.addEventListener('touchend', handleTouchEnd, { passive: true })
+    marquee.addEventListener('touchcancel', handleTouchEnd, { passive: true })
+    scheduleAutoScroll(cards)
 
     return () => {
-      window.cancelAnimationFrame(frameId)
-      window.clearTimeout(resumeTimeoutRef.current)
-      window.removeEventListener('resize', updateLoopWidth)
+      pauseAutoScroll()
+      stopResumeTimer()
+      marquee.removeEventListener('touchstart', handleTouchStart)
+      marquee.removeEventListener('touchend', handleTouchEnd)
+      marquee.removeEventListener('touchcancel', handleTouchEnd)
     }
   }, [isMobileReviews, reviews.length])
 
-  const scheduleResume = () => {
-    window.clearTimeout(resumeTimeoutRef.current)
-    resumeTimeoutRef.current = window.setTimeout(() => {
-      isSwipingRef.current = false
-    }, 650)
-  }
-
-  const handleTouchStart = (event) => {
-    swipeStartXRef.current = event.touches[0]?.clientX ?? 0
-    swipeStartYRef.current = event.touches[0]?.clientY ?? 0
-  }
-
-  const handleTouchMove = (event) => {
-    const currentX = event.touches[0]?.clientX ?? swipeStartXRef.current
-    const currentY = event.touches[0]?.clientY ?? swipeStartYRef.current
-
-    if (
-      Math.abs(currentX - swipeStartXRef.current) > 8
-      && Math.abs(currentX - swipeStartXRef.current) > Math.abs(currentY - swipeStartYRef.current)
-    ) {
-      isSwipingRef.current = true
-      window.clearTimeout(resumeTimeoutRef.current)
-    }
-  }
-
-  const handleTouchEnd = () => {
-    swipeStartXRef.current = 0
-    swipeStartYRef.current = 0
-
-    if (isSwipingRef.current) {
-      scheduleResume()
-    }
-  }
+  const ReviewCardTag = isMobileReviews ? 'article' : motion.article
 
   return (
     <section id="reviews" className="oav-section oav-section--steel">
@@ -138,31 +163,28 @@ export default function ReviewsSection({ reviews }) {
 
         <div
           className={`oav-reviews-marquee ${isMobileReviews ? 'is-mobile' : ''}`}
-          onTouchEnd={isMobileReviews ? handleTouchEnd : undefined}
-          onTouchMove={isMobileReviews ? handleTouchMove : undefined}
-          onTouchStart={isMobileReviews ? handleTouchStart : undefined}
           ref={marqueeRef}
         >
           <div className={`oav-reviews-track ${isMobileReviews ? 'is-mobile' : ''}`}>
             {displayedReviews.map((review, index) => (
-              <motion.article
+              <ReviewCardTag
                 key={`${review.project}-${review.location}-${index}`}
                 aria-hidden={index >= reviews.length}
                 className="oav-review-card"
-                {...reveal}
+                {...(isMobileReviews ? {} : reveal)}
               >
-              <div className="oav-review-meta">
-                <span className="oav-card-tag">{review.project}</span>
-                <span className="oav-review-location">{review.location}</span>
-              </div>
+                <div className="oav-review-meta">
+                  <span className="oav-card-tag">{review.project}</span>
+                  <span className="oav-review-location">{review.location}</span>
+                </div>
 
-              <p className="oav-review-quote">"{review.quote}"</p>
+                <p className="oav-review-quote">"{review.quote}"</p>
 
-              <div className="oav-review-client">
-                <strong>{review.client}</strong>
-                <span>{review.role}</span>
-              </div>
-              </motion.article>
+                <div className="oav-review-client">
+                  <strong>{review.client}</strong>
+                  <span>{review.role}</span>
+                </div>
+              </ReviewCardTag>
             ))}
           </div>
         </div>
