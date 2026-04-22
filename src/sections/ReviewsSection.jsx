@@ -10,8 +10,20 @@ const reveal = {
 }
 
 const MOBILE_BREAKPOINT = 760
-const AUTO_SCROLL_DELAY_MS = 3200
-const AUTO_SCROLL_RESUME_MS = 900
+const EDGE_TOLERANCE = 16
+
+function ArrowIcon({ direction = 'right' }) {
+  return (
+    <svg
+      aria-hidden="true"
+      style={{ transform: direction === 'left' ? 'rotate(180deg)' : 'none' }}
+      viewBox="0 0 24 24"
+    >
+      <path d="M5 12h14" />
+      <path d="m13 5 7 7-7 7" />
+    </svg>
+  )
+}
 
 export default function ReviewsSection({ reviews }) {
   const [isMobileReviews, setIsMobileReviews] = useState(() => {
@@ -21,10 +33,11 @@ export default function ReviewsSection({ reviews }) {
 
     return window.matchMedia(`(max-width: ${MOBILE_BREAKPOINT}px)`).matches
   })
+  const [scrollState, setScrollState] = useState({
+    canScrollLeft: false,
+    canScrollRight: reviews.length > 1,
+  })
   const marqueeRef = useRef(null)
-  const autoAdvanceTimeoutRef = useRef(0)
-  const resumeTimeoutRef = useRef(0)
-  const isPausedRef = useRef(false)
   const displayedReviews = isMobileReviews ? reviews : [...reviews, ...reviews]
 
   useEffect(() => {
@@ -48,107 +61,64 @@ export default function ReviewsSection({ reviews }) {
       return undefined
     }
 
-    const stopAutoScroll = () => {
-      window.clearTimeout(autoAdvanceTimeoutRef.current)
-    }
+    marquee.scrollTo({ left: 0, behavior: 'auto' })
 
-    const stopResumeTimer = () => {
-      window.clearTimeout(resumeTimeoutRef.current)
-    }
+    const updateScrollState = () => {
+      const maxScrollLeft = marquee.scrollWidth - marquee.clientWidth
+      const canScrollLeft = marquee.scrollLeft > EDGE_TOLERANCE
+      const canScrollRight = marquee.scrollLeft < maxScrollLeft - EDGE_TOLERANCE
 
-    const getActiveCardIndex = (cards) => {
-      if (!cards.length) {
-        return 0
-      }
-
-      const anchorX = marquee.scrollLeft + marquee.clientWidth / 2
-      let nearestIndex = 0
-      let nearestDistance = Number.POSITIVE_INFINITY
-
-      cards.forEach((card, index) => {
-        const cardCenter = card.offsetLeft + card.offsetWidth / 2
-        const distance = Math.abs(cardCenter - anchorX)
-
-        if (distance < nearestDistance) {
-          nearestDistance = distance
-          nearestIndex = index
+      setScrollState((currentState) => {
+        if (
+          currentState.canScrollLeft === canScrollLeft
+          && currentState.canScrollRight === canScrollRight
+        ) {
+          return currentState
         }
-      })
 
-      return nearestIndex
+        return { canScrollLeft, canScrollRight }
+      })
     }
 
-    const scheduleAutoScroll = (cards) => {
-      stopAutoScroll()
+    let frameId = 0
 
-      if (
-        !cards.length
-        || window.matchMedia('(prefers-reduced-motion: reduce)').matches
-      ) {
+    const scheduleScrollStateUpdate = () => {
+      if (frameId) {
         return
       }
 
-      autoAdvanceTimeoutRef.current = window.setTimeout(() => {
-        if (!marquee.isConnected || isPausedRef.current || !cards.length) {
-          return
-        }
-
-        const nextIndex = (getActiveCardIndex(cards) + 1) % cards.length
-        cards[nextIndex]?.scrollIntoView({
-          behavior: 'smooth',
-          block: 'nearest',
-          inline: 'start',
-        })
-
-        scheduleAutoScroll(cards)
-      }, AUTO_SCROLL_DELAY_MS)
+      frameId = window.requestAnimationFrame(() => {
+        frameId = 0
+        updateScrollState()
+      })
     }
 
-    const pauseAutoScroll = () => {
-      isPausedRef.current = true
-      stopAutoScroll()
-      stopResumeTimer()
-    }
-
-    const resumeAutoScroll = (cards) => {
-      stopResumeTimer()
-      resumeTimeoutRef.current = window.setTimeout(() => {
-        if (!marquee.isConnected) {
-          return
-        }
-
-        isPausedRef.current = false
-        scheduleAutoScroll(cards)
-      }, AUTO_SCROLL_RESUME_MS)
-    }
-
-    const handleTouchStart = () => {
-      pauseAutoScroll()
-    }
-
-    const handleTouchEnd = () => {
-      resumeAutoScroll(cards)
-    }
-
-    const cards = Array.from(
-      marquee.querySelectorAll('.oav-reviews-track .oav-review-card'),
-    )
-
-    isPausedRef.current = false
-    marquee.scrollTo({ left: 0, behavior: 'auto' })
-    marquee.addEventListener('touchstart', handleTouchStart, { passive: true })
-    marquee.addEventListener('touchend', handleTouchEnd, { passive: true })
-    marquee.addEventListener('touchcancel', handleTouchEnd, { passive: true })
-    scheduleAutoScroll(cards)
+    updateScrollState()
+    marquee.addEventListener('scroll', scheduleScrollStateUpdate, { passive: true })
+    window.addEventListener('resize', scheduleScrollStateUpdate)
 
     return () => {
-      pauseAutoScroll()
-      stopResumeTimer()
-      marquee.removeEventListener('touchstart', handleTouchStart)
-      marquee.removeEventListener('touchend', handleTouchEnd)
-      marquee.removeEventListener('touchcancel', handleTouchEnd)
+      if (frameId) {
+        window.cancelAnimationFrame(frameId)
+      }
+
+      marquee.removeEventListener('scroll', scheduleScrollStateUpdate)
+      window.removeEventListener('resize', scheduleScrollStateUpdate)
     }
   }, [isMobileReviews, reviews.length])
+
+  const scrollRail = (direction) => {
+    const marquee = marqueeRef.current
+
+    if (!marquee) {
+      return
+    }
+
+    marquee.scrollBy({
+      left: direction * Math.max(marquee.clientWidth * 0.82, 280),
+      behavior: 'smooth',
+    })
+  }
 
   const ReviewCardTag = isMobileReviews ? 'article' : motion.article
 
@@ -161,33 +131,83 @@ export default function ReviewsSection({ reviews }) {
           description="Feedback from residential, office, and developer jobs where clean finishing, dependable timing, and professional site conduct mattered."
         />
 
-        <div
-          className={`oav-reviews-marquee ${isMobileReviews ? 'is-mobile' : ''}`}
-          ref={marqueeRef}
-        >
-          <div className={`oav-reviews-track ${isMobileReviews ? 'is-mobile' : ''}`}>
-            {displayedReviews.map((review, index) => (
-              <ReviewCardTag
-                key={`${review.project}-${review.location}-${index}`}
-                aria-hidden={index >= reviews.length}
-                className="oav-review-card"
-                {...(isMobileReviews ? {} : reveal)}
-              >
-                <div className="oav-review-meta">
-                  <span className="oav-card-tag">{review.project}</span>
-                  <span className="oav-review-location">{review.location}</span>
-                </div>
+        {isMobileReviews ? (
+          <div className="oav-reviews-stage oav-reviews-stage--mobile">
+            <button
+              aria-label="Scroll reviews left"
+              className="oav-reviews-arrow oav-reviews-arrow--left"
+              disabled={!scrollState.canScrollLeft}
+              onClick={() => scrollRail(-1)}
+              type="button"
+            >
+              <ArrowIcon direction="left" />
+            </button>
 
-                <p className="oav-review-quote">"{review.quote}"</p>
+            <div
+              aria-label="Client review cards"
+              className="oav-reviews-marquee is-mobile"
+              ref={marqueeRef}
+              tabIndex={0}
+            >
+              <div className="oav-reviews-track is-mobile">
+                {displayedReviews.map((review, index) => (
+                  <ReviewCardTag
+                    key={`${review.project}-${review.location}-${index}`}
+                    aria-hidden={index >= reviews.length}
+                    className="oav-review-card"
+                  >
+                    <div className="oav-review-meta">
+                      <span className="oav-card-tag">{review.project}</span>
+                      <span className="oav-review-location">{review.location}</span>
+                    </div>
 
-                <div className="oav-review-client">
-                  <strong>{review.client}</strong>
-                  <span>{review.role}</span>
-                </div>
-              </ReviewCardTag>
-            ))}
+                    <p className="oav-review-quote">"{review.quote}"</p>
+
+                    <div className="oav-review-client">
+                      <strong>{review.client}</strong>
+                      <span>{review.role}</span>
+                    </div>
+                  </ReviewCardTag>
+                ))}
+              </div>
+            </div>
+
+            <button
+              aria-label="Scroll reviews right"
+              className="oav-reviews-arrow oav-reviews-arrow--right"
+              disabled={!scrollState.canScrollRight}
+              onClick={() => scrollRail(1)}
+              type="button"
+            >
+              <ArrowIcon />
+            </button>
           </div>
-        </div>
+        ) : (
+          <div className="oav-reviews-marquee" ref={marqueeRef}>
+            <div className="oav-reviews-track">
+              {displayedReviews.map((review, index) => (
+                <ReviewCardTag
+                  key={`${review.project}-${review.location}-${index}`}
+                  aria-hidden={index >= reviews.length}
+                  className="oav-review-card"
+                  {...reveal}
+                >
+                  <div className="oav-review-meta">
+                    <span className="oav-card-tag">{review.project}</span>
+                    <span className="oav-review-location">{review.location}</span>
+                  </div>
+
+                  <p className="oav-review-quote">"{review.quote}"</p>
+
+                  <div className="oav-review-client">
+                    <strong>{review.client}</strong>
+                    <span>{review.role}</span>
+                  </div>
+                </ReviewCardTag>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </section>
   )

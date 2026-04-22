@@ -2009,6 +2009,14 @@
   overflow: hidden;
 }
 
+.oav-reviews-stage {
+  position: relative;
+}
+
+.oav-reviews-stage--mobile {
+  display: none;
+}
+
 .oav-reviews-track {
   display: flex;
   align-items: stretch;
@@ -2038,6 +2046,60 @@
   border-color: var(--blue);
   background: #f5f5f3;
   transform: translateY(-4px);
+}
+
+.oav-reviews-arrow {
+  position: absolute;
+  top: 42%;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 54px;
+  height: 54px;
+  background: rgba(255, 255, 255, 0.82);
+  border: 1px solid rgba(15, 15, 15, 0.1);
+  border-radius: 999px;
+  color: var(--off);
+  backdrop-filter: blur(14px);
+  transition: transform 0.2s, background 0.2s, border-color 0.2s, opacity 0.2s;
+  box-shadow: 0 18px 35px rgba(0, 0, 0, 0.24);
+}
+
+.oav-reviews-arrow svg {
+  width: 20px;
+  height: 20px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.oav-reviews-arrow--left {
+  left: 0;
+  transform: translate(-10px, -50%);
+}
+
+.oav-reviews-arrow--right {
+  right: 0;
+  transform: translate(10px, -50%);
+}
+
+.oav-reviews-arrow:hover:not(:disabled) {
+  background: var(--blue);
+  border-color: var(--blue);
+  color: #fff;
+}
+
+.oav-reviews-arrow:focus-visible {
+  outline: 2px solid var(--blue);
+  outline-offset: 3px;
+}
+
+.oav-reviews-arrow:disabled {
+  opacity: 0.32;
+  cursor: default;
 }
 
 .oav-review-meta {
@@ -2931,14 +2993,22 @@
     display: block;
   }
 
+  .oav-reviews-stage--mobile {
+    display: block;
+    margin-top: 24px;
+    padding-bottom: 28px;
+  }
+
   .oav-reviews-marquee.is-mobile {
     overflow-x: auto;
-    overflow-y: visible;
+    overflow-y: hidden;
     -webkit-overflow-scrolling: touch;
     touch-action: auto;
     overscroll-behavior-x: contain;
+    overscroll-behavior-y: auto;
     scroll-snap-type: x mandatory;
     scroll-behavior: smooth;
+    scroll-padding-inline: 1rem;
     scrollbar-width: none;
     -ms-overflow-style: none;
     padding-bottom: 8px;
@@ -2961,6 +3031,21 @@
     scroll-snap-align: start;
     scroll-snap-stop: always;
     transition: none;
+  }
+
+  .oav-reviews-stage--mobile .oav-reviews-arrow {
+    width: 44px;
+    height: 44px;
+    top: 50%;
+    background: rgba(255, 255, 255, 0.88);
+  }
+
+  .oav-reviews-stage--mobile .oav-reviews-arrow--left {
+    transform: translate(-10px, -50%);
+  }
+
+  .oav-reviews-stage--mobile .oav-reviews-arrow--right {
+    transform: translate(10px, -50%);
   }
 
   .oav-reviews-track.is-mobile .oav-review-card:hover,

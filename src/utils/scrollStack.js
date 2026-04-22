@@ -1,4 +1,14 @@
 export const TRANSITION_PX = 600
+const MOBILE_TRANSITION_PX = 320
+const MOBILE_BREAKPOINT = 760
+
+function getTransitionPx() {
+  if (typeof window !== 'undefined' && window.matchMedia(`(max-width: ${MOBILE_BREAKPOINT}px)`).matches) {
+    return MOBILE_TRANSITION_PX
+  }
+
+  return TRANSITION_PX
+}
 
 export function getStackSections(sectionIds) {
   return sectionIds
@@ -18,10 +28,11 @@ export function measureScrollStack(sectionIds) {
   }
 
   const viewportHeight = window.innerHeight
+  const transitionPx = getTransitionPx()
   const heights = sections.map((section) => section.offsetHeight)
   const contentScrollHeights = heights.map((height) => Math.max(height - viewportHeight, 0))
   const zoneLengths = heights.map((_, index) => (
-    contentScrollHeights[index] + (index < heights.length - 1 ? TRANSITION_PX : 0)
+    contentScrollHeights[index] + (index < heights.length - 1 ? transitionPx : 0)
   ))
 
   let cumulativeLength = 0
@@ -37,6 +48,7 @@ export function measureScrollStack(sectionIds) {
     sections,
     totalScrollHeight: cumulativeLength,
     viewportHeight,
+    transitionPx,
     zoneLengths,
     zoneStarts,
   }
@@ -46,16 +58,17 @@ export function getSectionTranslateY(metrics, index, scrollY) {
   const zoneStart = metrics.zoneStarts[index]
   const contentScrollHeight = metrics.contentScrollHeights[index]
   const height = metrics.heights[index]
+  const transitionPx = metrics.transitionPx ?? TRANSITION_PX
   const contentEnd = zoneStart + contentScrollHeight
   const lastIndex = metrics.sections.length - 1
   const nextFullyIn = index < lastIndex ? metrics.zoneStarts[index + 1] : Infinity
 
-  if (index > 0 && scrollY <= zoneStart - TRANSITION_PX) {
+  if (index > 0 && scrollY <= zoneStart - transitionPx) {
     return metrics.viewportHeight
   }
 
   if (index > 0 && scrollY <= zoneStart) {
-    return metrics.viewportHeight * (1 - (scrollY - (zoneStart - TRANSITION_PX)) / TRANSITION_PX)
+    return metrics.viewportHeight * (1 - (scrollY - (zoneStart - transitionPx)) / transitionPx)
   }
 
   const scrollStart = index === 0 ? 0 : zoneStart
