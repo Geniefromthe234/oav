@@ -1,5 +1,13 @@
 export const TRANSITION_PX = 600
 
+function getViewportHeight() {
+  if (typeof window === 'undefined') {
+    return 0
+  }
+
+  return document.documentElement?.clientHeight || window.innerHeight
+}
+
 export function getStackSections(sectionIds) {
   return sectionIds
     .map((id) => document.getElementById(id))
@@ -17,7 +25,7 @@ export function measureScrollStack(sectionIds) {
     return null
   }
 
-  const viewportHeight = window.innerHeight
+  const viewportHeight = getViewportHeight()
   const heights = sections.map((section) => section.offsetHeight)
   const contentScrollHeights = heights.map((height) => Math.max(height - viewportHeight, 0))
   const zoneLengths = heights.map((_, index) => (
@@ -86,7 +94,7 @@ export function getSectionScrollTop(sectionIds, sectionId) {
 export function getTrackingLineY() {
   const header = document.querySelector('.oav-header')
   const headerHeight = header?.offsetHeight ?? 0
-  const viewportOffset = Math.min(Math.max(window.innerHeight * 0.32, 120), 240)
+  const viewportOffset = Math.min(Math.max(getViewportHeight() * 0.32, 120), 240)
 
   return headerHeight + viewportOffset
 }
