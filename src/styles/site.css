@@ -785,6 +785,11 @@
 }
 
 @media (width <=760px) {
+  html,
+  body {
+    overscroll-behavior-y: none;
+  }
+
   .oav-site {
     position: relative;
     overflow: clip;
@@ -793,10 +798,6 @@
   .oav-hero-grid {
     grid-template-columns: 1fr;
     gap: 28px;
-  }
-
-  .oav-hero-section {
-    min-height: 100svh;
   }
 
   .oav-hero-copy {

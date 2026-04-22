@@ -111,9 +111,19 @@ export default function useScrollStack(sectionIds) {
     window.addEventListener('scroll', scheduleUpdate, { passive: true })
     window.addEventListener('resize', onResize, { passive: true })
 
+    const visualViewport = window.visualViewport
+
+    if (visualViewport) {
+      visualViewport.addEventListener('resize', onResize, { passive: true })
+    }
+
     return () => {
       window.removeEventListener('scroll', scheduleUpdate)
       window.removeEventListener('resize', onResize)
+
+      if (visualViewport) {
+        visualViewport.removeEventListener('resize', onResize)
+      }
 
       sections.forEach((section, index) => {
         if (origStyles[index]) {

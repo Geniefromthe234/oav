@@ -5,6 +5,12 @@ function getViewportHeight() {
     return 0
   }
 
+  const visualViewport = window.visualViewport
+
+  if (visualViewport && visualViewport.scale === 1 && visualViewport.height > 0) {
+    return visualViewport.height
+  }
+
   return document.documentElement?.clientHeight || window.innerHeight
 }
 
