@@ -21,12 +21,13 @@ const stackTransforms = [
 const FLIP_DURATION_MS = 1800
 const HOLD_DURATION_MS = 6000
 
-export default function HeroCardStack({ prefersReducedMotion = false }) {
+export default function HeroCardStack({ isActive = true, prefersReducedMotion = false }) {
   const [cards, setCards] = useState(heroStackImages)
   const [isFlipping, setIsFlipping] = useState(false)
 
   useEffect(() => {
-    if (prefersReducedMotion) {
+    if (prefersReducedMotion || !isActive) {
+      setIsFlipping(false)
       return undefined
     }
 
@@ -61,7 +62,7 @@ export default function HeroCardStack({ prefersReducedMotion = false }) {
       window.clearTimeout(holdTimeoutId)
       window.clearTimeout(flipTimeoutId)
     }
-  }, [prefersReducedMotion])
+  }, [isActive, prefersReducedMotion])
 
   return (
     <div className="oav-hero-visual" aria-hidden="true">

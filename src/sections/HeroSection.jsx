@@ -81,7 +81,7 @@ function ServiceIcon({ type }) {
   )
 }
 
-export default function HeroSection({ slides }) {
+export default function HeroSection({ isActive = true, slides }) {
   const prefersReducedMotion = useReducedMotion()
   const [activeIndex, setActiveIndex] = useState(0)
   const [direction, setDirection] = useState(1)
@@ -91,13 +91,15 @@ export default function HeroSection({ slides }) {
   const typedTitleRef = useRef(typedTitle)
 
   useEffect(() => {
-    if (prefersReducedMotion) return
+    if (prefersReducedMotion || !isActive) return undefined
+
     const id = window.setInterval(() => {
       setDirection(1)
       setActiveIndex((c) => (c + 1) % slides.length)
     }, 13000)
+
     return () => window.clearInterval(id)
-  }, [activeIndex, prefersReducedMotion, slides.length])
+  }, [activeIndex, isActive, prefersReducedMotion, slides.length])
 
   useEffect(() => {
     typedTitleRef.current = typedTitle
@@ -120,7 +122,7 @@ export default function HeroSection({ slides }) {
   useEffect(() => {
     const nextTitle = slideTitleToText(slides[activeIndex])
 
-    if (prefersReducedMotion) {
+    if (prefersReducedMotion || !isActive) {
       setTypedTitle(nextTitle)
       typedTitleRef.current = nextTitle
       return undefined
@@ -174,10 +176,10 @@ export default function HeroSection({ slides }) {
       cancelled = true
       window.clearTimeout(timeoutId)
     }
-  }, [activeIndex, prefersReducedMotion, slides])
+  }, [activeIndex, isActive, prefersReducedMotion, slides])
 
   return (
-    <section id="home" className="oav-hero-section">
+    <section id="home" className={`oav-hero-section ${isActive ? 'is-active' : ''}`.trim()}>
       <div className="oav-shell oav-hero-layout">
         <div className="oav-hero-grid">
           <div className="oav-hero-copy">
@@ -243,7 +245,7 @@ export default function HeroSection({ slides }) {
             </div>
           </div>
 
-          <HeroCardStack prefersReducedMotion={prefersReducedMotion} />
+          <HeroCardStack isActive={isActive} prefersReducedMotion={prefersReducedMotion} />
         </div>
       </div>
 

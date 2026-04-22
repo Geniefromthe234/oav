@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import MetricStrip from '../components/site/MetricStrip'
 import SectionIntro from '../components/site/SectionIntro'
 
-export default function AboutSection({ highlights, principles, stats }) {
+export default function AboutSection({ highlights, isActive = true, principles, stats }) {
   const [activePrinciple, setActivePrinciple] = useState(0)
   const [isMobilePrinciples, setIsMobilePrinciples] = useState(false)
   const touchStartX = useRef(0)
@@ -28,7 +28,7 @@ export default function AboutSection({ highlights, principles, stats }) {
   }, [])
 
   useEffect(() => {
-    if (!isMobilePrinciples || totalPrinciples <= 1) {
+    if (!isActive || !isMobilePrinciples || totalPrinciples <= 1) {
       return undefined
     }
 
@@ -37,7 +37,7 @@ export default function AboutSection({ highlights, principles, stats }) {
     }, 7000)
 
     return () => window.clearInterval(intervalId)
-  }, [activePrinciple, isMobilePrinciples, totalPrinciples])
+  }, [activePrinciple, isActive, isMobilePrinciples, totalPrinciples])
 
   useEffect(() => {
     if (!isMobilePrinciples) {
@@ -70,7 +70,10 @@ export default function AboutSection({ highlights, principles, stats }) {
   }
 
   return (
-    <section id="about" className="oav-section oav-section--deep">
+    <section
+      id="about"
+      className={`oav-section oav-section--deep ${isActive ? 'is-active' : ''}`.trim()}
+    >
       <div className="oav-shell">
         <SectionIntro
           eyebrow="About OAV"

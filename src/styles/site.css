@@ -822,6 +822,24 @@
     inset: 6% 11% 12% 9%;
   }
 
+  .oav-hero-stack-card,
+  .oav-hero-stack-card-inner,
+  .oav-principle-grid.is-carousel {
+    will-change: auto;
+  }
+
+  .oav-hero-section.is-active .oav-hero-stack-card,
+  .oav-hero-section.is-active .oav-hero-stack-card-inner,
+  .oav-section.is-active .oav-principle-grid.is-carousel {
+    will-change: transform;
+  }
+
+  .oav-hero-section:not(.is-active) .oav-hero-lineup-track,
+  .oav-hero-section:not(.is-active) .oav-hero-stack-badge,
+  .oav-hero-section:not(.is-active) .oav-hero-type-cursor {
+    animation-play-state: paused;
+  }
+
   .oav-hero-stack-badge {
     left: -28px;
     bottom: 16px;

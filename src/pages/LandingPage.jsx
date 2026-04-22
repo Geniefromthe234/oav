@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react'
 import SiteFooter from '../components/site/SiteFooter'
 import SiteHeader from '../components/site/SiteHeader'
 import {
@@ -21,12 +22,32 @@ import PortfolioSection from '../sections/PortfolioSection'
 import ReviewsSection from '../sections/ReviewsSection'
 import ServicesSection from '../sections/ServicesSection'
 
+const MOBILE_BREAKPOINT = 760
+
+function getIsMobileViewport() {
+  if (typeof window === 'undefined') {
+    return false
+  }
+
+  return window.matchMedia(`(max-width: ${MOBILE_BREAKPOINT}px)`).matches
+}
 
 export default function LandingPage() {
   useScrollStack([...sectionIds, 'footer'])
   const { activeSection, setActiveSection } = useActiveSection(sectionIds)
+  const [isMobileViewport, setIsMobileViewport] = useState(getIsMobileViewport)
 
+  useEffect(() => {
+    const mediaQuery = window.matchMedia(`(max-width: ${MOBILE_BREAKPOINT}px)`)
+    const syncViewport = () => setIsMobileViewport(mediaQuery.matches)
 
+    syncViewport()
+    mediaQuery.addEventListener('change', syncViewport)
+
+    return () => mediaQuery.removeEventListener('change', syncViewport)
+  }, [])
+
+  const isSectionActive = (sectionId) => !isMobileViewport || activeSection === sectionId
 
   return (
     <>
@@ -37,9 +58,10 @@ export default function LandingPage() {
       />
 
       <main className="oav-site">
-        <HeroSection slides={heroSlides} />
+        <HeroSection isActive={isSectionActive('home')} slides={heroSlides} />
         <AboutSection
           highlights={aboutHighlights}
+          isActive={isSectionActive('about')}
           principles={operatingPrinciples}
           stats={heroStats}
         />
