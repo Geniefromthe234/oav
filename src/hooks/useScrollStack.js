@@ -40,6 +40,23 @@ export default function useScrollStack(sectionIds) {
       }
     }
 
+    function isTextInputFocused() {
+      const activeElement = document.activeElement
+
+      if (!(activeElement instanceof HTMLElement)) {
+        return false
+      }
+
+      const tagName = activeElement.tagName
+
+      return (
+        tagName === 'INPUT'
+        || tagName === 'TEXTAREA'
+        || tagName === 'SELECT'
+        || activeElement.isContentEditable
+      )
+    }
+
     function shouldPreserveScrollPosition() {
       return !metrics?.isStickyMode
     }
@@ -59,7 +76,7 @@ export default function useScrollStack(sectionIds) {
 
       const widthDelta = Math.abs(nextSnapshot.width - viewportSnapshot.width)
       const heightDelta = Math.abs(nextSnapshot.height - viewportSnapshot.height)
-      const hasMeaningfulChange = widthDelta > 2 || heightDelta > 120
+      const hasMeaningfulChange = widthDelta > 2 || (heightDelta > 120 && isTextInputFocused())
 
       if (hasMeaningfulChange) {
         viewportSnapshot = nextSnapshot
@@ -185,6 +202,10 @@ export default function useScrollStack(sectionIds) {
     const resizeObserver =
       typeof ResizeObserver !== 'undefined'
         ? new ResizeObserver(() => {
+          if (metrics?.isStickyMode && !hasMeaningfulViewportChange()) {
+            return
+          }
+
           scheduleMeasure({ preserveScroll: shouldPreserveScrollPosition() })
         })
         : null
