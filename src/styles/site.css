@@ -2049,7 +2049,11 @@ body::-webkit-scrollbar {
   overflow-y: hidden;
   scrollbar-width: none;
   -ms-overflow-style: none;
-  scroll-behavior: smooth;
+}
+
+.oav-reviews-stage--desktop {
+  overflow: hidden;
+  padding-top: 12px;
 }
 
 .oav-reviews-marquee::-webkit-scrollbar {
@@ -2070,6 +2074,10 @@ body::-webkit-scrollbar {
   gap: 24px;
   width: max-content;
   will-change: auto;
+}
+
+.oav-reviews-stage--desktop .oav-reviews-track {
+  will-change: transform;
 }
 
 .oav-review-card {
@@ -2195,16 +2203,6 @@ body::-webkit-scrollbar {
   letter-spacing: 2px;
   text-transform: uppercase;
   color: var(--blue);
-}
-
-@keyframes oav-reviews-marquee {
-  from {
-    transform: translateX(0);
-  }
-
-  to {
-    transform: translateX(calc(-50% - 12px));
-  }
 }
 
 /* -- CONTACT ------------------------------------------- */

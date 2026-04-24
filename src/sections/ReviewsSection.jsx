@@ -3,6 +3,7 @@ import SectionIntro from '../components/site/SectionIntro'
 
 const MOBILE_BREAKPOINT = 760
 const EDGE_TOLERANCE = 16
+const DESKTOP_AUTO_SCROLL_SPEED = 26
 
 function ArrowIcon({ direction = 'right' }) {
   return (
@@ -29,7 +30,9 @@ export default function ReviewsSection({ reviews }) {
     canScrollLeft: false,
     canScrollRight: reviews.length > 1,
   })
-  const marqueeRef = useRef(null)
+  const mobileMarqueeRef = useRef(null)
+  const desktopStageRef = useRef(null)
+  const desktopTrackRef = useRef(null)
 
   useEffect(() => {
     const mediaQuery = window.matchMedia(`(max-width: ${MOBILE_BREAKPOINT}px)`)
@@ -46,7 +49,7 @@ export default function ReviewsSection({ reviews }) {
       return undefined
     }
 
-    const marquee = marqueeRef.current
+    const marquee = mobileMarqueeRef.current
 
     if (!marquee) {
       return undefined
@@ -98,8 +101,173 @@ export default function ReviewsSection({ reviews }) {
     }
   }, [isMobileReviews, reviews.length])
 
+  useEffect(() => {
+    if (isMobileReviews) {
+      return undefined
+    }
+
+    const stage = desktopStageRef.current
+    const track = desktopTrackRef.current
+
+    if (!stage || !track) {
+      return undefined
+    }
+
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)')
+    let reduceMotion = prefersReducedMotion.matches
+    let frameId = 0
+    let lastTimestamp = 0
+    let maxOffset = 0
+    let currentOffset = 0
+    let direction = 1
+    let isPaused = false
+    let isDocumentVisible = document.visibilityState === 'visible'
+    let resizeObserver
+
+    const applyOffset = () => {
+      track.style.transform = `translate3d(${-currentOffset}px, 0, 0)`
+    }
+
+    const stopLoop = () => {
+      if (frameId) {
+        window.cancelAnimationFrame(frameId)
+        frameId = 0
+      }
+
+      lastTimestamp = 0
+    }
+
+    const measureBounds = () => {
+      maxOffset = Math.max(track.scrollWidth - stage.clientWidth, 0)
+
+      if (maxOffset <= EDGE_TOLERANCE) {
+        currentOffset = 0
+        direction = 1
+      } else if (currentOffset > maxOffset) {
+        currentOffset = maxOffset
+      }
+
+      applyOffset()
+    }
+
+    const step = (timestamp) => {
+      frameId = 0
+
+      if (reduceMotion || isPaused || !isDocumentVisible || maxOffset <= EDGE_TOLERANCE) {
+        lastTimestamp = 0
+        return
+      }
+
+      const elapsed = lastTimestamp ? Math.min(timestamp - lastTimestamp, 32) : 16
+      const distance = (DESKTOP_AUTO_SCROLL_SPEED * elapsed) / 1000
+      const nextOffset = currentOffset + distance * direction
+
+      if (nextOffset >= maxOffset) {
+        currentOffset = maxOffset
+        direction = -1
+      } else if (nextOffset <= 0) {
+        currentOffset = 0
+        direction = 1
+      } else {
+        currentOffset = nextOffset
+      }
+
+      lastTimestamp = timestamp
+      applyOffset()
+      frameId = window.requestAnimationFrame(step)
+    }
+
+    const scheduleLoop = () => {
+      if (frameId || reduceMotion || isPaused || !isDocumentVisible || maxOffset <= EDGE_TOLERANCE) {
+        return
+      }
+
+      frameId = window.requestAnimationFrame(step)
+    }
+
+    const syncReducedMotion = () => {
+      reduceMotion = prefersReducedMotion.matches
+
+      if (reduceMotion) {
+        stopLoop()
+        return
+      }
+
+      scheduleLoop()
+    }
+
+    const handleResize = () => {
+      measureBounds()
+      stopLoop()
+      scheduleLoop()
+    }
+
+    const handlePointerEnter = () => {
+      isPaused = true
+      stopLoop()
+    }
+
+    const handlePointerLeave = () => {
+      isPaused = false
+      scheduleLoop()
+    }
+
+    const handleVisibilityChange = () => {
+      isDocumentVisible = document.visibilityState === 'visible'
+
+      if (!isDocumentVisible) {
+        stopLoop()
+        return
+      }
+
+      measureBounds()
+      scheduleLoop()
+    }
+
+    if (typeof prefersReducedMotion.addEventListener === 'function') {
+      prefersReducedMotion.addEventListener('change', syncReducedMotion)
+    } else if (typeof prefersReducedMotion.addListener === 'function') {
+      prefersReducedMotion.addListener(syncReducedMotion)
+    }
+
+    stage.addEventListener('pointerenter', handlePointerEnter)
+    stage.addEventListener('pointerleave', handlePointerLeave)
+    document.addEventListener('visibilitychange', handleVisibilityChange)
+
+    if ('ResizeObserver' in window) {
+      resizeObserver = new window.ResizeObserver(handleResize)
+      resizeObserver.observe(stage)
+      resizeObserver.observe(track)
+    } else {
+      window.addEventListener('resize', handleResize)
+    }
+
+    measureBounds()
+    scheduleLoop()
+
+    return () => {
+      stopLoop()
+      track.style.transform = ''
+      stage.removeEventListener('pointerenter', handlePointerEnter)
+      stage.removeEventListener('pointerleave', handlePointerLeave)
+      document.removeEventListener('visibilitychange', handleVisibilityChange)
+
+      if (resizeObserver) {
+        resizeObserver.disconnect()
+      } else {
+        window.removeEventListener('resize', handleResize)
+      }
+
+      if (typeof prefersReducedMotion.removeEventListener === 'function') {
+        prefersReducedMotion.removeEventListener('change', syncReducedMotion)
+      } else if (typeof prefersReducedMotion.removeListener === 'function') {
+        prefersReducedMotion.removeListener(syncReducedMotion)
+      }
+    }
+  }, [isMobileReviews, reviews.length])
+
   const scrollRail = (direction) => {
-    const marquee = marqueeRef.current
+    const marquee = mobileMarqueeRef.current
 
     if (!marquee) {
       return
@@ -109,19 +277,6 @@ export default function ReviewsSection({ reviews }) {
       left: direction * Math.max(marquee.clientWidth * 0.82, 280),
       behavior: 'smooth',
     })
-  }
-
-  const handleMarqueeWheel = (event) => {
-    if (
-      isMobileReviews
-      || Math.abs(event.deltaY) <= Math.abs(event.deltaX)
-      || event.shiftKey
-    ) {
-      return
-    }
-
-    event.preventDefault()
-    marqueeRef.current?.scrollBy({ left: event.deltaY, behavior: 'auto' })
   }
 
   return (
@@ -148,7 +303,7 @@ export default function ReviewsSection({ reviews }) {
             <div
               aria-label="Client review cards"
               className="oav-reviews-marquee is-mobile"
-              ref={marqueeRef}
+              ref={mobileMarqueeRef}
               tabIndex={0}
             >
               <div className="oav-reviews-track is-mobile">
@@ -185,12 +340,10 @@ export default function ReviewsSection({ reviews }) {
           </div>
         ) : (
           <div
-            className="oav-reviews-marquee"
-            onWheel={handleMarqueeWheel}
-            ref={marqueeRef}
-            tabIndex={0}
+            className="oav-reviews-stage oav-reviews-stage--desktop"
+            ref={desktopStageRef}
           >
-            <div className="oav-reviews-track">
+            <div className="oav-reviews-track" ref={desktopTrackRef}>
               {reviews.map((review, index) => (
                 <article
                   key={`${review.project}-${review.location}-${index}`}
