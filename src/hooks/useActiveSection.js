@@ -1,8 +1,12 @@
 import { useEffect, useRef, useState } from 'react'
 import {
   findActiveStackSectionFromMetrics,
+  getCachedScrollStackMetrics,
+  getHeaderBottomOffset,
+  getScrollYForSectionProgress,
   getSectionTranslateY,
   getTrackingLineY,
+  getViewportHeight,
   measureScrollStack,
 } from '../utils/scrollStack'
 
@@ -20,13 +24,63 @@ function getScrollBehavior() {
   return window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth'
 }
 
+function getDocumentScrollHeight() {
+  return Math.max(
+    document.documentElement?.scrollHeight ?? 0,
+    document.body?.scrollHeight ?? 0,
+  )
+}
+
+function getScrollTargetTop(targetTop) {
+  const headerBottomOffset = getHeaderBottomOffset()
+  const maxScrollTop = Math.max(getDocumentScrollHeight() - getViewportHeight(), 0)
+
+  return Math.min(Math.max(targetTop - headerBottomOffset, 0), maxScrollTop)
+}
+
+function getSections(sectionIds) {
+  return sectionIds
+    .map((id) => document.getElementById(id))
+    .filter((section) => section instanceof HTMLElement)
+}
+
+function hasReachedTrackedLine(metrics, sectionId) {
+  if (!metrics?.sections.length) {
+    return false
+  }
+
+  const index = metrics.sections.findIndex((section) => section.id === sectionId)
+
+  if (index < 0) {
+    return false
+  }
+
+  const top = getSectionTranslateY(metrics, index, window.scrollY)
+  const bottom = top + metrics.heights[index]
+  const trackingLineY = getTrackingLineY()
+
+  return trackingLineY >= top && trackingLineY < bottom
+}
+
+function getMetrics(sectionIds, metricsRef) {
+  const sharedMetrics = getCachedScrollStackMetrics(sectionIds)
+
+  if (sharedMetrics) {
+    metricsRef.current = sharedMetrics
+    return sharedMetrics
+  }
+
+  const measuredMetrics = measureScrollStack(sectionIds)
+
+  metricsRef.current = measuredMetrics
+  return measuredMetrics
+}
+
 export default function useActiveSection(sectionIds) {
   const [activeSection, setActiveSection] = useState(() => getInitialSection(sectionIds))
   const pendingTargetRef = useRef(null)
   const metricsRef = useRef(null)
   const scrollFrameRef = useRef(0)
-  const metricsFrameRef = useRef(0)
-  const viewportSnapshotRef = useRef(null)
   const sectionKey = sectionIds?.join('|') ?? ''
 
   useEffect(() => {
@@ -34,79 +88,14 @@ export default function useActiveSection(sectionIds) {
       return undefined
     }
 
-    const refreshMetrics = () => {
-      metricsRef.current = measureScrollStack(sectionIds)
-      viewportSnapshotRef.current = getViewportSnapshot()
-      return metricsRef.current
-    }
-
-    const getMetrics = () => metricsRef.current || refreshMetrics()
-
-    function getViewportSnapshot() {
-      const visualViewport = window.visualViewport
-
-      return {
-        height: visualViewport?.height ?? window.innerHeight,
-        width: visualViewport?.width ?? window.innerWidth,
-      }
-    }
-
-    function hasMeaningfulViewportChange() {
-      const nextSnapshot = getViewportSnapshot()
-      const previousSnapshot = viewportSnapshotRef.current
-
-      if (!previousSnapshot) {
-        viewportSnapshotRef.current = nextSnapshot
-        return true
-      }
-
-      const metrics = metricsRef.current
-
-      if (!metrics?.isStickyMode) {
-        viewportSnapshotRef.current = nextSnapshot
-        return true
-      }
-
-      const widthDelta = Math.abs(nextSnapshot.width - previousSnapshot.width)
-      const heightDelta = Math.abs(nextSnapshot.height - previousSnapshot.height)
-      const hasMeaningfulChange = widthDelta > 2 || heightDelta > 120
-
-      if (hasMeaningfulChange) {
-        viewportSnapshotRef.current = nextSnapshot
-      }
-
-      return hasMeaningfulChange
-    }
-
-    const hasReachedTrackedLine = (metrics, sectionId) => {
-      if (!metrics?.sections.length) {
-        return false
-      }
-
-      const index = metrics.sections.findIndex((section) => section.id === sectionId)
-
-      if (index < 0) {
-        return false
-      }
-
-      const top = getSectionTranslateY(metrics, index, window.scrollY)
-      const bottom = top + metrics.heights[index]
-      const trackingLineY = getTrackingLineY()
-
-      return trackingLineY >= top && trackingLineY < bottom
-    }
+    const resolveMetrics = () => getMetrics(sectionIds, metricsRef)
 
     const scrollToSection = (sectionId, { behavior = getScrollBehavior(), pushHash = false } = {}) => {
-      const metrics = getMetrics()
+      const targetSection = document.getElementById(sectionId)
+      const metrics = resolveMetrics()
+      const targetTop = getScrollYForSectionProgress(metrics, sectionId, 0)
 
-      if (!metrics) {
-        return
-      }
-
-      const index = metrics.sections.findIndex((section) => section.id === sectionId)
-      const targetTop = index >= 0 ? metrics.zoneStarts[index] : null
-
-      if (targetTop === null) {
+      if (!(targetSection instanceof HTMLElement) || targetTop === null) {
         return
       }
 
@@ -124,11 +113,14 @@ export default function useActiveSection(sectionIds) {
       }
 
       setActiveSection((current) => (current === sectionId ? current : sectionId))
-      window.scrollTo({ top: targetTop, behavior })
+      window.scrollTo({
+        top: getScrollTargetTop(targetTop),
+        behavior,
+      })
     }
 
     const syncActiveSection = (metricsOverride = null) => {
-      const metrics = metricsOverride || getMetrics()
+      const metrics = metricsOverride || resolveMetrics()
 
       if (!metrics) {
         return
@@ -162,23 +154,6 @@ export default function useActiveSection(sectionIds) {
       scrollFrameRef.current = window.requestAnimationFrame(() => {
         scrollFrameRef.current = 0
         syncActiveSection()
-      })
-    }
-
-    const scheduleMetricsRefresh = ({ force = false } = {}) => {
-      if (!force && !hasMeaningfulViewportChange()) {
-        return
-      }
-
-      if (metricsFrameRef.current) {
-        return
-      }
-
-      metricsFrameRef.current = window.requestAnimationFrame(() => {
-        metricsFrameRef.current = 0
-        const metrics = refreshMetrics()
-
-        syncActiveSection(metrics)
       })
     }
 
@@ -229,20 +204,15 @@ export default function useActiveSection(sectionIds) {
       syncActiveSection()
     }
 
-    refreshMetrics()
-
     const resizeObserver =
       typeof ResizeObserver !== 'undefined'
         ? new ResizeObserver(() => {
-          scheduleMetricsRefresh({ force: true })
+          scheduleSyncActiveSection()
         })
         : null
 
     if (resizeObserver) {
-      sectionIds
-        .map((id) => document.getElementById(id))
-        .filter(Boolean)
-        .forEach((section) => resizeObserver.observe(section))
+      getSections(sectionIds).forEach((section) => resizeObserver.observe(section))
     }
 
     const visualViewport = window.visualViewport
@@ -254,13 +224,13 @@ export default function useActiveSection(sectionIds) {
     }
 
     window.addEventListener('scroll', scheduleSyncActiveSection, { passive: true })
-    window.addEventListener('resize', scheduleMetricsRefresh)
+    window.addEventListener('resize', scheduleSyncActiveSection)
     window.addEventListener('hashchange', handleLocationChange)
     window.addEventListener('popstate', handleLocationChange)
     document.addEventListener('click', handleSectionLinkClick, true)
 
     if (visualViewport) {
-      visualViewport.addEventListener('resize', scheduleMetricsRefresh, { passive: true })
+      visualViewport.addEventListener('resize', scheduleSyncActiveSection, { passive: true })
     }
 
     return () => {
@@ -269,19 +239,14 @@ export default function useActiveSection(sectionIds) {
         scrollFrameRef.current = 0
       }
 
-      if (metricsFrameRef.current) {
-        window.cancelAnimationFrame(metricsFrameRef.current)
-        metricsFrameRef.current = 0
-      }
-
       window.removeEventListener('scroll', scheduleSyncActiveSection)
-      window.removeEventListener('resize', scheduleMetricsRefresh)
+      window.removeEventListener('resize', scheduleSyncActiveSection)
       window.removeEventListener('hashchange', handleLocationChange)
       window.removeEventListener('popstate', handleLocationChange)
       document.removeEventListener('click', handleSectionLinkClick, true)
 
       if (visualViewport) {
-        visualViewport.removeEventListener('resize', scheduleMetricsRefresh)
+        visualViewport.removeEventListener('resize', scheduleSyncActiveSection)
       }
 
       resizeObserver?.disconnect()

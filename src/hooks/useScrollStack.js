@@ -1,34 +1,29 @@
-import { useEffect } from 'react'
+import { useLayoutEffect } from 'react'
 import {
-  findActiveStackSectionFromMetrics,
-  getScrollYForSectionProgress,
-  getSectionScrollProgress,
-  getSectionTranslateY,
+  clearCachedScrollStackMetrics,
   measureScrollStack,
+  setCachedScrollStackMetrics,
 } from '../utils/scrollStack'
 
 export default function useScrollStack(sectionIds) {
   const sectionKey = sectionIds?.join('|') ?? ''
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!sectionIds || sectionIds.length < 2) {
       return undefined
     }
 
     const sections = sectionIds
       .map((id) => document.getElementById(id))
-      .filter(Boolean)
+      .filter((section) => section instanceof HTMLElement)
 
     if (sections.length < 2) {
       return undefined
     }
 
-    const siteEl = sections[0].closest('.oav-site')
-    const origStyles = sections.map((section) => section.getAttribute('style') || '')
+    const lastIndex = sections.length - 1
     let metrics = null
-    let updateFrameId = 0
     let measureFrameId = 0
-    let preserveScrollOnMeasure = false
     let viewportSnapshot = null
 
     function getViewportSnapshot() {
@@ -36,6 +31,7 @@ export default function useScrollStack(sectionIds) {
 
       return {
         height: visualViewport?.height ?? window.innerHeight,
+        scale: visualViewport?.scale ?? 1,
         width: visualViewport?.width ?? window.innerWidth,
       }
     }
@@ -57,10 +53,6 @@ export default function useScrollStack(sectionIds) {
       )
     }
 
-    function shouldPreserveScrollPosition() {
-      return !metrics?.isStickyMode
-    }
-
     function hasMeaningfulViewportChange() {
       const nextSnapshot = getViewportSnapshot()
 
@@ -69,14 +61,14 @@ export default function useScrollStack(sectionIds) {
         return true
       }
 
-      if (!metrics?.isStickyMode) {
-        viewportSnapshot = nextSnapshot
-        return true
-      }
-
       const widthDelta = Math.abs(nextSnapshot.width - viewportSnapshot.width)
       const heightDelta = Math.abs(nextSnapshot.height - viewportSnapshot.height)
-      const hasMeaningfulChange = widthDelta > 2 || (heightDelta > 120 && isTextInputFocused())
+      const scaleDelta = Math.abs(nextSnapshot.scale - viewportSnapshot.scale)
+      const heightThreshold = isTextInputFocused() ? 120 : 24
+      const hasMeaningfulChange =
+        widthDelta > 2
+        || heightDelta > heightThreshold
+        || scaleDelta > 0.01
 
       if (hasMeaningfulChange) {
         viewportSnapshot = nextSnapshot
@@ -85,20 +77,32 @@ export default function useScrollStack(sectionIds) {
       return hasMeaningfulChange
     }
 
-    function measure() {
-      sections.forEach((section, index) => {
-        if (origStyles[index]) {
-          section.setAttribute('style', origStyles[index])
-        } else {
-          section.removeAttribute('style')
-        }
-      })
-
-      if (siteEl) {
-        siteEl.style.minHeight = ''
+    function clearStackStyles(section) {
+      if (!(section instanceof HTMLElement)) {
+        return
       }
 
+      section.style.removeProperty('--oav-stack-top')
+      section.style.removeProperty('--oav-stack-layer')
+      section.style.removeProperty('--oav-stack-trigger')
+      section.style.removeProperty('--oav-stack-height')
+      section.style.removeProperty('z-index')
+      section.style.removeProperty('top')
+      section.style.removeProperty('position')
+      section.style.removeProperty('transform')
+      section.style.removeProperty('will-change')
+      section.style.removeProperty('left')
+      section.style.removeProperty('width')
+      delete section.dataset.stackPanel
+    }
+
+    function applyMetrics() {
+      sections.forEach((section) => {
+        delete section.dataset.stackPanel
+      })
+
       metrics = measureScrollStack(sectionIds)
+      setCachedScrollStackMetrics(sectionIds, metrics)
       viewportSnapshot = getViewportSnapshot()
 
       if (!metrics) {
@@ -106,82 +110,31 @@ export default function useScrollStack(sectionIds) {
       }
 
       sections.forEach((section, index) => {
-        section.style.position = 'fixed'
-        section.style.top = '0'
-        section.style.left = '0'
-        section.style.width = '100%'
-        section.style.zIndex = String(index + 2)
-        section.style.willChange = 'transform'
-      })
+        const panelHeight = metrics.heights[index]
+        const stickyTop = metrics.stackTriggerY - panelHeight
 
-      if (siteEl) {
-        siteEl.style.minHeight = metrics.isStickyMode
-          ? `${metrics.totalScrollHeight}px`
-          : `${metrics.totalScrollHeight + metrics.viewportHeight}px`
-      }
-    }
+        clearStackStyles(section)
 
-    function scheduleUpdate() {
-      if (updateFrameId || !metrics) {
-        return
-      }
-
-      updateFrameId = requestAnimationFrame(() => {
-        updateFrameId = 0
-
-        const scrollY = window.scrollY
-
-        sections.forEach((section, index) => {
-          const translateY = Math.round(getSectionTranslateY(metrics, index, scrollY))
-
-          section.style.transform = `translate3d(0, ${translateY}px, 0)`
-        })
-      })
-    }
-
-    function remeasure({ preserveScroll = false } = {}) {
-      const shouldPreserveScroll = preserveScroll && shouldPreserveScrollPosition()
-      const currentSectionId = shouldPreserveScroll && metrics
-        ? findActiveStackSectionFromMetrics(metrics, sectionIds[0] ?? 'home')
-        : null
-      const currentSectionProgress = currentSectionId
-        ? getSectionScrollProgress(metrics, currentSectionId)
-        : 0
-
-      measure()
-
-      if (currentSectionId) {
-        const preservedScrollY = getScrollYForSectionProgress(
-          metrics,
-          currentSectionId,
-          currentSectionProgress,
-        )
-
-        if (
-          typeof preservedScrollY === 'number'
-          && Math.abs(window.scrollY - preservedScrollY) > 2
-        ) {
-          window.scrollTo({ top: preservedScrollY, behavior: 'auto' })
+        if (index >= lastIndex) {
+          return
         }
-      }
 
-      scheduleUpdate()
+        section.dataset.stackPanel = 'true'
+        section.style.setProperty('--oav-stack-height', `${panelHeight}px`)
+        section.style.setProperty('--oav-stack-layer', String(index + 2))
+        section.style.setProperty('--oav-stack-top', `${stickyTop}px`)
+        section.style.setProperty('--oav-stack-trigger', `${metrics.stackTriggerY}px`)
+      })
     }
 
-    function scheduleMeasure({ preserveScroll = false } = {}) {
-      preserveScrollOnMeasure = preserveScrollOnMeasure || preserveScroll
-
+    function scheduleMeasure() {
       if (measureFrameId) {
         return
       }
 
-      measureFrameId = requestAnimationFrame(() => {
+      measureFrameId = window.requestAnimationFrame(() => {
         measureFrameId = 0
-
-        const nextPreserveScroll = preserveScrollOnMeasure
-
-        preserveScrollOnMeasure = false
-        remeasure({ preserveScroll: nextPreserveScroll })
+        applyMetrics()
       })
     }
 
@@ -190,23 +143,17 @@ export default function useScrollStack(sectionIds) {
         return
       }
 
-      scheduleMeasure({ preserveScroll: shouldPreserveScrollPosition() })
+      scheduleMeasure()
     }
 
-    measure()
-    scheduleUpdate()
-    window.addEventListener('scroll', scheduleUpdate, { passive: true })
+    applyMetrics()
     window.addEventListener('resize', onResize, { passive: true })
 
     const visualViewport = window.visualViewport
     const resizeObserver =
       typeof ResizeObserver !== 'undefined'
         ? new ResizeObserver(() => {
-          if (metrics?.isStickyMode && !hasMeaningfulViewportChange()) {
-            return
-          }
-
-          scheduleMeasure({ preserveScroll: shouldPreserveScrollPosition() })
+          scheduleMeasure()
         })
         : null
 
@@ -217,34 +164,23 @@ export default function useScrollStack(sectionIds) {
     sections.forEach((section) => resizeObserver?.observe(section))
 
     return () => {
-      window.removeEventListener('scroll', scheduleUpdate)
       window.removeEventListener('resize', onResize)
 
       if (visualViewport) {
         visualViewport.removeEventListener('resize', onResize)
       }
 
-      if (updateFrameId) {
-        cancelAnimationFrame(updateFrameId)
-      }
-
       if (measureFrameId) {
-        cancelAnimationFrame(measureFrameId)
+        window.cancelAnimationFrame(measureFrameId)
       }
 
       resizeObserver?.disconnect()
 
-      sections.forEach((section, index) => {
-        if (origStyles[index]) {
-          section.setAttribute('style', origStyles[index])
-        } else {
-          section.removeAttribute('style')
-        }
+      sections.forEach((section) => {
+        clearStackStyles(section)
       })
 
-      if (siteEl) {
-        siteEl.style.minHeight = ''
-      }
+      clearCachedScrollStackMetrics(sectionIds)
     }
   }, [sectionKey])
 }

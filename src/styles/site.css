@@ -7,13 +7,13 @@
 .oav-whatsapp-float {
   position: fixed;
   right: max(18px, env(safe-area-inset-right));
-  bottom: max(18px, env(safe-area-inset-bottom));
+  bottom: max(48px, calc(env(safe-area-inset-bottom) + 30px));
   z-index: 80;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 54px;
-  height: 54px;
+  width: 81px;
+  height: 81px;
   padding: 0;
   border-radius: 999px;
   background: #25d366;
@@ -41,8 +41,8 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 26px;
-  height: 26px;
+  width: 39px;
+  height: 39px;
 }
 
 .oav-whatsapp-float-icon svg {
@@ -50,65 +50,17 @@
   height: 100%;
 }
 
-@media (min-width: 761px) {
+html,
+body {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
 
-  html,
-  body {
-    scrollbar-color: #1a7fd4 #efefed;
-    scrollbar-width: auto;
-  }
-
-  html::-webkit-scrollbar,
-  body::-webkit-scrollbar {
-    width: 16px;
-    background: #efefed;
-  }
-
-  html::-webkit-scrollbar-track,
-  body::-webkit-scrollbar-track {
-    background: linear-gradient(90deg, #efefed 0 24%, #ffffff 24% 76%, #efefed 76% 100%);
-  }
-
-  html::-webkit-scrollbar-thumb,
-  body::-webkit-scrollbar-thumb {
-    background: #1a7fd4;
-    border: 4px solid #ffffff;
-    border-radius: 999px;
-  }
-
-  html::-webkit-scrollbar-button,
-  body::-webkit-scrollbar-button,
-  html::-webkit-scrollbar-button:single-button,
-  body::-webkit-scrollbar-button:single-button,
-  html::-webkit-scrollbar-button:start,
-  body::-webkit-scrollbar-button:start,
-  html::-webkit-scrollbar-button:end,
-  body::-webkit-scrollbar-button:end,
-  html::-webkit-scrollbar-button:vertical:decrement,
-  body::-webkit-scrollbar-button:vertical:decrement,
-  html::-webkit-scrollbar-button:vertical:increment,
-  body::-webkit-scrollbar-button:vertical:increment,
-  html::-webkit-scrollbar-button:single-button:vertical:decrement,
-  body::-webkit-scrollbar-button:single-button:vertical:decrement,
-  html::-webkit-scrollbar-button:single-button:vertical:increment,
-  body::-webkit-scrollbar-button:single-button:vertical:increment,
-  html::-webkit-scrollbar-button:single-button:vertical:start:decrement,
-  body::-webkit-scrollbar-button:single-button:vertical:start:decrement,
-  html::-webkit-scrollbar-button:single-button:vertical:end:increment,
-  body::-webkit-scrollbar-button:single-button:vertical:end:increment {
-    display: block;
-    appearance: none;
-    -webkit-appearance: none;
-    width: 0;
-    height: 0;
-    min-height: 0;
-    background: transparent;
-    background-image: none;
-    border: 0;
-    box-shadow: none;
-    margin: 0;
-    padding: 0;
-  }
+html::-webkit-scrollbar,
+body::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
 }
 
 
@@ -1152,10 +1104,20 @@
 }
 
 /* ── STACKING LAYERS ──────────────────────────────────────
-   JS (useScrollStack) sets position:fixed + translateY at
-   runtime. These rules provide fallback z-index and solid
-   backgrounds so nothing bleeds through during transitions.
+   JS (useScrollStack) sets per-panel sticky offsets so only
+   the active section handoff needs browser-managed stacking.
+   These rules keep backgrounds and z-order explicit.
 ────────────────────────────────────────────────────────── */
+.oav-site {
+  isolation: isolate;
+}
+
+.oav-site > [data-stack-panel="true"] {
+  position: sticky;
+  top: var(--oav-stack-top, 0px);
+  z-index: var(--oav-stack-layer, 2);
+}
+
 #home {
   z-index: 2;
 }
@@ -1182,6 +1144,10 @@
 #contact {
   z-index: 7;
   background: #f5f5f3;
+}
+
+#footer {
+  z-index: 8;
 }
 
 /* subtle bg shifts for rhythm */
@@ -2755,14 +2721,14 @@
 
   .oav-whatsapp-float {
     right: max(14px, env(safe-area-inset-right));
-    bottom: max(14px, env(safe-area-inset-bottom));
-    width: 50px;
-    height: 50px;
+    bottom: max(44px, calc(env(safe-area-inset-bottom) + 30px));
+    width: 75px;
+    height: 75px;
   }
 
   .oav-whatsapp-float-icon {
-    width: 24px;
-    height: 24px;
+    width: 36px;
+    height: 36px;
   }
 
   .oav-shell {
